@@ -1,0 +1,14 @@
+program BackupFiles;
+
+uses
+  System.StartUpCopy,
+  FMX.Forms,
+  BackupFiles.View.Main in 'src\View\BackupFiles.View.Main.pas' {ViewMain};
+
+{$R *.res}
+
+begin
+  Application.Initialize;
+  Application.CreateForm(TViewMain, ViewMain);
+  Application.Run;
+end.

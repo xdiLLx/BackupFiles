@@ -3,15 +3,18 @@ unit BackupFiles.Model.BackupItem;
 interface
 
 uses
-  BackupFiles.Controller.BackupItem,
-  System.SysUtils;
+  System.SysUtils,
+  BackupFiles.Model.Interfaces;
 
 type
   TBackupItem = class(TInterfacedObject, iBackupItem)
   private
+    FNome: string;
     FCaminho: string;
     FTamanho: Int64;
     FUltimaModificacao: TDateTime;
+    function Nome(Value: string): iBackupItem; overload;
+    function Nome: string; overload;
     function Caminho(Value: string): iBackupItem; overload;
     function Caminho: string; overload;
     function Tamanho(Value: Int64): iBackupItem; overload;
@@ -57,10 +60,21 @@ begin
   inherited;
 end;
 
-
 class function TBackupItem.New: iBackupItem;
 begin
-  Result:= Self.Create;
+  Result := Self.Create;
+end;
+
+function TBackupItem.Nome: string;
+begin
+  Result := FNome;
+end;
+
+function TBackupItem.Nome(Value: string): iBackupItem;
+begin
+  if Value = '' then
+    raise Exception.Create('O Arquivo selecionado é inválido');
+  FNome := Value;
 end;
 
 function TBackupItem.Tamanho(Value: Int64): iBackupItem;

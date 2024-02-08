@@ -1,0 +1,17 @@
+unit BackupFiles.Controller.Interfaces;
+
+interface
+
+type
+  iControllerRoutine = interface
+    ['{68320D65-C5DA-450E-B1E1-C81CA7F79891}']
+  end;
+
+  iControllerBackupItem = interface
+    ['{E1151506-5D0C-4FD8-A0C9-09C99DF1E15C}']
+    function Item: iBackupItem;
+  end;
+
+implementation
+
+end.

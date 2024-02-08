@@ -7,15 +7,18 @@ uses
   BackupFiles.Model.BackupItem in 'src\Model\BackupFiles.Model.BackupItem.pas',
   BackupFiles.Controller.BackupItem in 'src\Controller\BackupFiles.Controller.BackupItem.pas',
   BackupFiles.Model.Routine in 'src\Model\BackupFiles.Model.Routine.pas',
-  BackupFiles.Controller.Rotina in 'src\Controller\BackupFiles.Controller.Rotina.pas',
-  BackupFiles.Model.LocalStorageSettings in 'src\Model\BackupFiles.Model.LocalStorageSettings.pas',
-  BackupFiles.Model.FtpStorageSettings in 'src\Model\BackupFiles.Model.FtpStorageSettings.pas',
-  BackupFiles.Controller.StorageSettings in 'src\Controller\BackupFiles.Controller.StorageSettings.pas';
+  BackupFiles.Controller.Routine in 'src\Controller\BackupFiles.Controller.Routine.pas',
+  BackupFiles.Model.StorageSettings in 'src\Model\BackupFiles.Model.StorageSettings.pas',
+  BackupFiles.Controller.StorageSettings in 'src\Controller\BackupFiles.Controller.StorageSettings.pas',
+  BackupFiles.Model.Interfaces in 'src\Model\BackupFiles.Model.Interfaces.pas',
+  BackupFiles.Controller.Interfaces in 'src\Controller\BackupFiles.Controller.Interfaces.pas';
 
 {$R *.res}
 
 begin
   Application.Initialize;
+  ReportMemoryLeaksonshutdown := true;
   Application.CreateForm(TViewMain, ViewMain);
   Application.Run;
+
 end.

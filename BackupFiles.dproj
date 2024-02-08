@@ -194,10 +194,11 @@
         <DCCReference Include="src\Model\BackupFiles.Model.BackupItem.pas"/>
         <DCCReference Include="src\Controller\BackupFiles.Controller.BackupItem.pas"/>
         <DCCReference Include="src\Model\BackupFiles.Model.Routine.pas"/>
-        <DCCReference Include="src\Controller\BackupFiles.Controller.Rotina.pas"/>
-        <DCCReference Include="src\Model\BackupFiles.Model.LocalStorageSettings.pas"/>
-        <DCCReference Include="src\Model\BackupFiles.Model.FtpStorageSettings.pas"/>
+        <DCCReference Include="src\Controller\BackupFiles.Controller.Routine.pas"/>
+        <DCCReference Include="src\Model\BackupFiles.Model.StorageSettings.pas"/>
         <DCCReference Include="src\Controller\BackupFiles.Controller.StorageSettings.pas"/>
+        <DCCReference Include="src\Model\BackupFiles.Model.Interfaces.pas"/>
+        <DCCReference Include="src\Controller\BackupFiles.Controller.Interfaces.pas"/>
         <BuildConfiguration Include="Base">
             <Key>Base</Key>
         </BuildConfiguration>

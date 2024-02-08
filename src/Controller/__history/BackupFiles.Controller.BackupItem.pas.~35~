@@ -1,0 +1,48 @@
+unit BackupFiles.Controller.BackupItem;
+
+interface
+
+uses
+  BackupFiles.Controller.Interfaces;
+
+type
+  TControllerBackupItem = class(TInterfacedObject, iControllerBackupItem)
+  private
+
+  public
+    constructor Create;
+    destructor Destroy; override;
+    class function New: iControllerBackupItem;
+    function Item: iBackupItem;
+  end;
+
+implementation
+
+uses
+  BackupFiles.Model.BackupItem;
+
+{ TControllerBackupItem }
+
+
+constructor TControllerBackupItem.Create;
+begin
+
+end;
+
+destructor TControllerBackupItem.Destroy;
+begin
+
+  inherited;
+end;
+
+function TControllerBackupItem.Item: iBackupItem;
+begin
+   Result := TBackupItem.New;
+end;
+
+class function TControllerBackupItem.New: iControllerBackupItem;
+begin
+   Result:= Self.Create;
+end;
+
+end.

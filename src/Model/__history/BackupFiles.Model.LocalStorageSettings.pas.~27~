@@ -1,0 +1,119 @@
+unit BackupFiles.Model.LocalStorageSettings;
+
+interface
+
+uses
+  BackupFiles.Model.Interfaces;
+
+type
+  TLocalStorageSettings = class(TInterfacedObject, iStorageSettings)
+  private
+    FDiretorio: string;
+    FServidor: string;
+    FUsuario: string;
+    FSenha: string;
+    FPorta: integer;
+    { Campos privados }
+    function Diretorio(Value: string): iStorageSettings; overload;
+    function Diretorio: string; overload;
+    function Servidor(Value: string): iStorageSettings; overload;
+    function Servidor: string; overload;
+    function Usuario(Value: string): iStorageSettings; overload;
+    function Usuario: string; overload;
+    function Senha(Value: string): iStorageSettings; overload;
+    function Senha: string; overload;
+    function Porta(Value: integer): iStorageSettings; overload;
+    function Porta: integer; overload;
+  public
+    constructor Create;
+    destructor Destroy; override;
+    class function New: iStorageSettings;
+  end;
+
+implementation
+
+uses
+  System.SysUtils;
+
+{ TLocalStorageSettings }
+
+constructor TLocalStorageSettings.Create;
+begin
+
+end;
+
+destructor TLocalStorageSettings.Destroy;
+begin
+
+  inherited;
+end;
+
+function TLocalStorageSettings.Diretorio(Value: string): iStorageSettings;
+begin
+  if Value = '' then
+    raise Exception.Create('O Caminho do diretório não pode estar em branco');
+  if not DirectoryExists(Value) then
+    raise Exception.Create('O diretório informado não existe');
+  FDiretorio := Value;
+  Result := Self;
+end;
+
+function TLocalStorageSettings.Diretorio: string;
+begin
+  Result := FDiretorio;
+end;
+
+class function TLocalStorageSettings.New: iStorageSettings;
+begin
+  Result := Self.Create;
+end;
+
+function TLocalStorageSettings.Porta(Value: integer): iStorageSettings;
+begin
+  FPorta := Value;
+  Result := Self;
+end;
+
+function TLocalStorageSettings.Porta: integer;
+begin
+  Result := FPorta;
+end;
+
+function TLocalStorageSettings.Senha(Value: string): iStorageSettings;
+begin
+  FSenha := Value;
+  Result := Self;
+end;
+
+function TLocalStorageSettings.Senha: string;
+begin
+  Result := FSenha;
+end;
+
+function TLocalStorageSettings.Servidor: string;
+begin
+  Result := FServidor;
+end;
+
+function TLocalStorageSettings.Servidor(Value: string): iStorageSettings;
+begin
+  if Value = '' then
+    raise Exception.Create('Hostname/IP do servidor não poder ficar em branco');
+  FServidor := Value;
+  Result := Self;
+end;
+
+function TLocalStorageSettings.Usuario(Value: string): iStorageSettings;
+begin
+  if Value = '' then
+    raise Exception.Create('Usuario do servidor não poder ficar em branco');
+  FUsuario := Value;
+  Result := Self;
+end;
+
+function TLocalStorageSettings.Usuario: string;
+begin
+  Result := FUsuario;
+end;
+
+end.

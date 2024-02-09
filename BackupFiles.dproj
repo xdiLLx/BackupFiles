@@ -142,6 +142,8 @@
         <Manifest_File>$(BDS)\bin\default_app.manifest</Manifest_File>
         <UWP_DelphiLogo44>$(BDS)\bin\Artwork\Windows\UWP\delphi_UwpDefault_44.png</UWP_DelphiLogo44>
         <UWP_DelphiLogo150>$(BDS)\bin\Artwork\Windows\UWP\delphi_UwpDefault_150.png</UWP_DelphiLogo150>
+        <DCC_ExeOutput>E:\Meus Projetos\InstaBackupFiles\</DCC_ExeOutput>
+        <AppDPIAwarenessMode>none</AppDPIAwarenessMode>
     </PropertyGroup>
     <PropertyGroup Condition="'$(Base_Win64)'!=''">
         <DCC_UsePackage>ngcgoogle5svc;vclwinx;lmdrtgrid;fmx;lmdrtbar;vclie;DbxCommonDriver;bindengine;IndyIPCommon;VCLRESTComponents;FireDACCommonODBC;lmdrtscriptimp;ChromeTabs_R;FireDACCommonDriver;appanalytics;IndyProtocols;vclx;ngcgoogle4svc;ngcgoogle3svc;IndyIPClient;dbxcds;vcledge;ngvalidators;ngcgoogle7svc;bindcompvclwinx;Skia.Package.RTL;FmxTeeUI;ngcruntime;bindcompfmx;inetdb;lmdrtsys;ngcommon;ibmonitor;FireDACSqliteDriver;DbxClientDriver;lmdrtdesign;lmdrtsearchdb;nghtml;ngcgoogle6svc;Tee;soapmidas;ngcgoogle2svc;OrpheusDBDR;vclactnband;TeeUI;fmxFireDAC;dbexpress;lmdrtspell;lmdrtelcore;DBXMySQLDriver;VclSmp;inet;lmdrtchart;FIBPlus_D28;lmdrtrtfdb;vcltouch;fmxase;ngcboxnet;lmdrtplugin;UIRibbonPackageDR;dbrtl;ngcdropbox;Skia.Package.FMX;fmxdae;TeeDB;lmdrtsearch;FireDACMSAccDriver;CustomIPTransport;lmdrtthemes;lmdrtcore;lmdrtide;lmdrtstorage;vcldsnap;DBXInterBaseDriver;lmdrtfx;ngcgoogle11svc;IndySystem;lmdrtl;ngvldtctrls;ngcgoogle15svc;OrpheusDR;ngcgoogle18svc;lmdrtinspector;lmdrtrtf;lmdrtsyntax;Skia.Package.VCL;vcldb;ibxbindings;ngdragdrop;ngdialogs;ngcgoogle;lmdrtshell;vclFireDAC;bindcomp;FireDACCommon;lmdrtweb;ngcgoogle19svc;lmdrtelpro;IndyCore;RESTBackendComponents;bindcompdbx;lmdrttools;lmdrtdialog;rtl;FireDACMySQLDriver;lmdrtdocking;FireDACADSDriver;RESTComponents;ngcgoogle10svc;DBXSqliteDriver;vcl;IndyIPServer;dsnapxml;dsnapcon;adortl;ngcgoogle14svc;lmdrteldb;lmdrttoolsdb;vclimg;FireDACPgDriver;FireDAC;inetdbxpress;xmlrtl;tethering;ibxpress;ngcgoogle13svc;ngcgoogle12svc;bindcompvcl;dsnap;lmdrtchartdb;lmdrtprint;ngcgoogle17svc;CloudService;ngcgoogle16svc;lmdrtrtlx;vclib;ngcgoogle8svc;fmxobj;bindcompvclsmp;FMXTee;lmdrtscript;ngcgoogle9svc;ngcgoogle1svc;soaprtl;soapserver;FireDACIBDriver;$(DCC_UsePackage)</DCC_UsePackage>
@@ -167,6 +169,9 @@
     <PropertyGroup Condition="'$(Cfg_1_Win32)'!=''">
         <DCC_RemoteDebug>false</DCC_RemoteDebug>
         <AppDPIAwarenessMode>PerMonitorV2</AppDPIAwarenessMode>
+        <DCC_ExeOutput>E:\Meus Projetos\InstaBackupFiles\</DCC_ExeOutput>
+        <VerInfo_IncludeVerInfo>true</VerInfo_IncludeVerInfo>
+        <VerInfo_Locale>1033</VerInfo_Locale>
     </PropertyGroup>
     <PropertyGroup Condition="'$(Cfg_1_Win64)'!=''">
         <AppDPIAwarenessMode>PerMonitorV2</AppDPIAwarenessMode>
@@ -199,6 +204,21 @@
         <DCCReference Include="src\Controller\BackupFiles.Controller.StorageSettings.pas"/>
         <DCCReference Include="src\Model\BackupFiles.Model.Interfaces.pas"/>
         <DCCReference Include="src\Controller\BackupFiles.Controller.Interfaces.pas"/>
+        <DCCReference Include="src\DAO\BackupFiles.DAO.Routine.pas">
+            <Form>DMRoutine</Form>
+            <FormType>dfm</FormType>
+            <DesignClass>TDataModule</DesignClass>
+        </DCCReference>
+        <DCCReference Include="src\DAO\BackupFiles.DAO.Main.pas">
+            <Form>DM</Form>
+            <FormType>dfm</FormType>
+            <DesignClass>TDataModule</DesignClass>
+        </DCCReference>
+        <DCCReference Include="src\DAO\BackupFiles.DAO.BackupItem.pas">
+            <Form>dmBackupItem</Form>
+            <FormType>dfm</FormType>
+            <DesignClass>TDataModule</DesignClass>
+        </DCCReference>
         <BuildConfiguration Include="Base">
             <Key>Base</Key>
         </BuildConfiguration>
@@ -219,6 +239,17 @@
                 <Source>
                     <Source Name="MainSource">BackupFiles.dpr</Source>
                 </Source>
+                <Excluded_Packages>
+                    <Excluded_Packages Name="$(BDSBIN)\dcloffice2k280.bpl">Microsoft Office 2000 Sample Automation Server Wrapper Components</Excluded_Packages>
+                    <Excluded_Packages Name="$(BDSBIN)\dclofficexp280.bpl">Microsoft Office XP Sample Automation Server Wrapper Components</Excluded_Packages>
+                    <Excluded_Packages Name="C:\Users\Public\Documents\Embarcadero\Studio\22.0\Bpl\JclBaseExpert280.bpl">File C:\Users\Public\Documents\Embarcadero\Studio\22.0\Bpl\JclBaseExpert280.bpl not found</Excluded_Packages>
+                    <Excluded_Packages Name="C:\Users\Public\Documents\Embarcadero\Studio\22.0\Bpl\JclDebugExpert280.bpl">File C:\Users\Public\Documents\Embarcadero\Studio\22.0\Bpl\JclDebugExpert280.bpl not found</Excluded_Packages>
+                    <Excluded_Packages Name="C:\Users\Public\Documents\Embarcadero\Studio\22.0\Bpl\JclProjectAnalysisExpert280.bpl">File C:\Users\Public\Documents\Embarcadero\Studio\22.0\Bpl\JclProjectAnalysisExpert280.bpl not found</Excluded_Packages>
+                    <Excluded_Packages Name="C:\Users\Public\Documents\Embarcadero\Studio\22.0\Bpl\JclFavoriteFoldersExpert280.bpl">File C:\Users\Public\Documents\Embarcadero\Studio\22.0\Bpl\JclFavoriteFoldersExpert280.bpl not found</Excluded_Packages>
+                    <Excluded_Packages Name="C:\Users\Public\Documents\Embarcadero\Studio\22.0\Bpl\JclRepositoryExpert280.bpl">File C:\Users\Public\Documents\Embarcadero\Studio\22.0\Bpl\JclRepositoryExpert280.bpl not found</Excluded_Packages>
+                    <Excluded_Packages Name="C:\Users\Public\Documents\Embarcadero\Studio\22.0\Bpl\JclSIMDViewExpert280.bpl">File C:\Users\Public\Documents\Embarcadero\Studio\22.0\Bpl\JclSIMDViewExpert280.bpl not found</Excluded_Packages>
+                    <Excluded_Packages Name="C:\Users\Public\Documents\Embarcadero\Studio\22.0\Bpl\JclStackTraceViewerExpert280.bpl">File C:\Users\Public\Documents\Embarcadero\Studio\22.0\Bpl\JclStackTraceViewerExpert280.bpl not found</Excluded_Packages>
+                </Excluded_Packages>
             </Delphi.Personality>
             <Deployment Version="4">
                 <DeployFile LocalName="$(BDS)\Redist\iossimulator\libcgunwind.1.0.dylib" Class="DependencyModule">
@@ -236,7 +267,7 @@
                         <Overwrite>true</Overwrite>
                     </Platform>
                 </DeployFile>
-                <DeployFile LocalName="Win32\Debug\BackupFiles.exe" Configuration="Debug" Class="ProjectOutput">
+                <DeployFile LocalName="..\InstaBackupFiles\BackupFiles.exe" Configuration="Debug" Class="ProjectOutput">
                     <Platform Name="Win32">
                         <RemoteName>BackupFiles.exe</RemoteName>
                         <Overwrite>true</Overwrite>

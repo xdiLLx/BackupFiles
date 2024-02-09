@@ -14,23 +14,23 @@ type
   private
     { Campos privados }
     FCodigo: string;
+    FDescricao: string;
     FHorario: TDateTime;
     FTotalBackups: Integer;
     FItemLista: TList<iBackupItem>;
     FSettings: iStorageSettings;
-    FIniciarComWindows: Boolean;
     function Codigo: string;
     function Horario(Value: TDateTime): iRoutine; overload;
     function Horario: TDateTime; overload;
     function TotalBackupsSalvos(Value: Integer): iRoutine; overload;
     function TotalBackupsSalvos: Integer; overload;
-    function IniciarComWindows(Value: Boolean): iRoutine; overload;
-    function IniciarComWindows: Boolean; overload;
     function AdicionarItem(Value: iBackupItem): iRoutine;
     function RemoverItem(Value: iBackupItem): iRoutine;
     function ListarItens: TList<iBackupItem>;
     function Configuracao(Value: iStorageSettings): iRoutine; overload;
     function Configuracao: iStorageSettings; overload;
+    function Descricao: string; overload;
+    function Descricao(Value: string): iRoutine; overload;
 
   public
     constructor Create;
@@ -102,6 +102,19 @@ begin
   FItemLista := TList<iBackupItem>.Create;
 end;
 
+function TRoutine.Descricao(Value: string): iRoutine;
+begin
+  if Value = '' then
+    raise Exception.Create('A Descrição não pode ficar em branco');
+  FDescricao := Value;
+  Result := Self;
+end;
+
+function TRoutine.Descricao: string;
+begin
+  Result := FDescricao;
+end;
+
 destructor TRoutine.Destroy;
 begin
   FItemLista.Free;
@@ -111,17 +124,6 @@ end;
 function TRoutine.Horario: TDateTime;
 begin
   Result := FHorario;
-end;
-
-function TRoutine.IniciarComWindows: Boolean;
-begin
-  Result := FIniciarComWindows;
-end;
-
-function TRoutine.IniciarComWindows(Value: Boolean): iRoutine;
-begin
-  FIniciarComWindows := Value;
-  Result := Self;
 end;
 
 function TRoutine.ListarItens: TList<iBackupItem>;

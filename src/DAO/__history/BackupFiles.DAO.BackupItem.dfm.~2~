@@ -1,0 +1,24 @@
+object dmBackupItem: TdmBackupItem
+  Height = 480
+  Width = 640
+  object TabItemBackupFiltrada: TFDQuery
+    Connection = DM.database
+    SQL.Strings = (
+      'select * from itembackup r where r.codigo = :codigo')
+    Left = 152
+    Top = 16
+    ParamData = <
+      item
+        Name = 'CODIGO'
+        ParamType = ptInput
+        Value = Null
+      end>
+  end
+  object TabItemBackup: TFDQuery
+    Connection = DM.database
+    SQL.Strings = (
+      'select * from itembackup r')
+    Left = 32
+    Top = 16
+  end
+end

@@ -8,14 +8,17 @@ uses
 type
   iBackupItem = interface
     ['{030A2996-BBC7-439F-AD07-FFD4443093AA}']
-    function Nome(Value: string): iBackupItem; overload;
-    function Nome: string; overload;
+    function Nome: string;
     function Caminho(Value: string): iBackupItem; overload;
     function Caminho: string; overload;
-    function Tamanho(Value: int64): iBackupItem; overload;
-    function Tamanho: int64; overload;
-    function UltimaModificacao(Value: TDatetime): iBackupItem; overload;
-    function UltimaModificacao: TDatetime; overload;
+    function Tamanho: int64;
+    function UltimaModificacao: TDatetime;
+    function CodigoRotina(Value: string): iBackupItem; overload;
+    function CodigoRotina: string; overload;
+    function Codigo: string;
+    function CodigoInterno: integer;
+    function BuscarDados(aCodigo: string): iBackupItem;
+    function Salvar: iBackupItem;
   end;
 
   iStorageSettings = interface
@@ -44,6 +47,8 @@ type
     function ListarItens: TList<iBackupItem>;
     function Configuracao(Value: iStorageSettings): iRoutine; overload;
     function Configuracao: iStorageSettings; overload;
+    function Descricao: string; overload;
+    function Descricao(Value: string): iRoutine; overload;
   end;
 
 implementation

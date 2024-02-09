@@ -11,7 +11,10 @@ uses
   BackupFiles.Model.StorageSettings in 'src\Model\BackupFiles.Model.StorageSettings.pas',
   BackupFiles.Controller.StorageSettings in 'src\Controller\BackupFiles.Controller.StorageSettings.pas',
   BackupFiles.Model.Interfaces in 'src\Model\BackupFiles.Model.Interfaces.pas',
-  BackupFiles.Controller.Interfaces in 'src\Controller\BackupFiles.Controller.Interfaces.pas';
+  BackupFiles.Controller.Interfaces in 'src\Controller\BackupFiles.Controller.Interfaces.pas',
+  BackupFiles.DAO.Routine in 'src\DAO\BackupFiles.DAO.Routine.pas' {DMRoutine: TDataModule},
+  BackupFiles.DAO.Main in 'src\DAO\BackupFiles.DAO.Main.pas' {DM: TDataModule},
+  BackupFiles.DAO.BackupItem in 'src\DAO\BackupFiles.DAO.BackupItem.pas' {dmBackupItem: TDataModule};
 
 {$R *.res}
 
@@ -19,6 +22,9 @@ begin
   Application.Initialize;
   ReportMemoryLeaksonshutdown := true;
   Application.CreateForm(TViewMain, ViewMain);
+  Application.CreateForm(TDMRoutine, DMRoutine);
+  Application.CreateForm(TDM, DM);
+  Application.CreateForm(TdmBackupItem, dmBackupItem);
   Application.Run;
 
 end.

@@ -1,0 +1,4 @@
+object dmBackupItem: TdmBackupItem
+  Height = 480
+  Width = 640
+end

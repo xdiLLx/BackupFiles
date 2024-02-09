@@ -1,0 +1,25 @@
+unit BackupFiles.DAO.BackupItem;
+
+interface
+
+uses
+  System.SysUtils, System.Classes;
+
+type
+  TdmBackupItem = class(TDataModule)
+  private
+    { Private declarations }
+  public
+    { Public declarations }
+  end;
+
+var
+  dmBackupItem: TdmBackupItem;
+
+implementation
+
+{%CLASSGROUP 'FMX.Controls.TControl'}
+
+{$R *.dfm}
+
+end.

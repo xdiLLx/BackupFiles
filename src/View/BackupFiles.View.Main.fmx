@@ -8,20 +8,33 @@ object ViewMain: TViewMain
   FormFactor.Height = 480
   FormFactor.Devices = [Desktop]
   DesignerMasterStyle = 0
-  object Edit1: TEdit
+  object edtcaminho: TEdit
     Touch.InteractiveGestures = [LongTap, DoubleTap]
     TabOrder = 0
-    Position.X = 88.000000000000000000
-    Position.Y = 120.000000000000000000
+    Position.X = 64.000000000000000000
+    Position.Y = 64.000000000000000000
     Size.Width = 377.000000000000000000
     Size.Height = 25.000000000000000000
     Size.PlatformDefault = False
   end
   object Button1: TButton
-    Position.X = 280.000000000000000000
-    Position.Y = 240.000000000000000000
+    Position.X = 64.000000000000000000
+    Position.Y = 112.000000000000000000
     TabOrder = 1
     Text = 'Button1'
     OnClick = Button1Click
+  end
+  object Button2: TButton
+    Position.X = 216.000000000000000000
+    Position.Y = 112.000000000000000000
+    TabOrder = 2
+    Text = 'Button2'
+    OnClick = Button2Click
+  end
+  object Edit1: TEdit
+    Touch.InteractiveGestures = [LongTap, DoubleTap]
+    TabOrder = 4
+    Position.X = 464.000000000000000000
+    Position.Y = 112.000000000000000000
   end
 end

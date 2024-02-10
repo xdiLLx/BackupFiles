@@ -134,11 +134,6 @@ begin
   dmStorageSettings.TabConfiguracaoArmazenamento.Post;
 end;
 
-class function TStorageSettings.New: iStorageSettings;
-begin
-  Result:= Self.Create;
-end;
-
 function TStorageSettings.BuscarDados(aCodigo: string): iStorageSettings;
 begin
   if (aCodigo.IsEmpty) or (Length(aCodigo) <> 25) then
@@ -174,10 +169,6 @@ end;
 function TStorageSettings.Codigo: string;
 begin
   Result := FCodigo;
-end;
-
-constructor TStorageSettings.Create;
-begin
 end;
 
 constructor TStorageSettings.Create(TipoConfiguracao: TTipoConfigStorage);

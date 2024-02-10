@@ -136,7 +136,7 @@ end;
 
 class function TStorageSettings.New: iStorageSettings;
 begin
-  Result:= Self.Create;
+
 end;
 
 function TStorageSettings.BuscarDados(aCodigo: string): iStorageSettings;
@@ -178,6 +178,7 @@ end;
 
 constructor TStorageSettings.Create;
 begin
+
 end;
 
 constructor TStorageSettings.Create(TipoConfiguracao: TTipoConfigStorage);

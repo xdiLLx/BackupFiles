@@ -22,18 +22,4 @@ object DMRoutine: TDMRoutine
         Value = Null
       end>
   end
-  object BuscaItensBackup: TFDQuery
-    Connection = DM.database
-    SQL.Strings = (
-      'select * from itembackup i '
-      'where i.CodigoRotina = :codigorotina')
-    Left = 240
-    Top = 16
-    ParamData = <
-      item
-        Name = 'CODIGOROTINA'
-        ParamType = ptInput
-        Value = Null
-      end>
-  end
 end

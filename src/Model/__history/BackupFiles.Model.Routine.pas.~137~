@@ -16,7 +16,7 @@ type
     function GenerateUniqueCode: string;
     function AtualizarNoBanco: string;
     function InserirNoBanco: string;
-    procedure BuscaItensRotina;
+    function BuscaItensRotina: TList<iBackupItem>;
   private
     { Campos privados }
     FCodigo: string;
@@ -106,21 +106,21 @@ begin
   DMRoutine.TabRotinaFiltrada.Post;
 end;
 
-procedure TRoutine.BuscaItensRotina;
+function TRoutine.BuscaItensRotina: TList<iBackupItem>;
 begin
   DMRoutine.BuscaItensBackup.Close;
   DMRoutine.BuscaItensBackup.ParamByName('codigorotina').AsString := FCodigo;
   DMRoutine.BuscaItensBackup.Open;
 
   FItemLista.Clear;
-  DMRoutine.BuscaItensBackup.First;
   while not DMRoutine.BuscaItensBackup.Eof do
   begin
     FItemLista.Add(
-    TControllerBackupItem.
-    New.
-    Item(FCodigo).
-    BuscarDados(DMRoutine.BuscaItensBackup.FieldByName('Codigo').AsString)
+
+
+
+
+
     );
 
     DMRoutine.BuscaItensBackup.Next;
@@ -148,7 +148,7 @@ begin
     ('CodigoRotina').AsString;
   FCodigo := DMRoutine.TabRotinaFiltrada.FieldByName('Codigo').AsString;
   FSettings := TControllerStorageSettings.New.BuscarConfiguracao(lCodigoConfig);
-  BuscaItensRotina;
+  FItemLista := BuscaItensRotina;
 
   Result := Self;
 end;

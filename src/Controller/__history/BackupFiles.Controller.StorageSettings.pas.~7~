@@ -15,21 +15,12 @@ type
     constructor Create;
     destructor Destroy; override;
     class function New: iControllerStorageSettings;
-    function Item(TipoConfig: TTipoConfigStorage): iStorageSettings;
-    function BuscarConfiguracao(CodigoRotina:string): iStorageSettings;
+    function Item(CodigoRotina:string): iBackupItem;
   end;
 
 implementation
 
 { TControllerStorageSettings }
-
-uses BackupFiles.Model.StorageSettings;
-
-function TControllerStorageSettings.BuscarConfiguracao(
-  CodigoRotina: string): iStorageSettings;
-begin
-  Result := Self.New.BuscarConfiguracao(CodigoRotina)
-end;
 
 constructor TControllerStorageSettings.Create;
 begin
@@ -40,12 +31,6 @@ destructor TControllerStorageSettings.Destroy;
 begin
 
   inherited;
-end;
-
-function TControllerStorageSettings.Item(
-  TipoConfig: TTipoConfigStorage): iStorageSettings;
-begin
-  Result:= TStorageSettings.New(TipoConfig);
 end;
 
 class function TControllerStorageSettings.New: iControllerStorageSettings;

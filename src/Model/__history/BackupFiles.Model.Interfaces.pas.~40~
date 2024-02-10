@@ -17,7 +17,7 @@ type
     function CodigoRotina: string; overload;
     function Codigo: string;
     function CodigoInterno: integer;
-    function BuscarDados(CodigoItem:string): iBackupItem;
+    function BuscarDados(aCodigo: string): iBackupItem;
     function Salvar: iBackupItem;
   end;
 

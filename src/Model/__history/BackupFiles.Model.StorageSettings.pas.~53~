@@ -38,11 +38,9 @@ type
     function BuscarDados(aCodigo: string): iStorageSettings;
     function Salvar: iStorageSettings;
   public
-    constructor Create(TipoConfiguracao: TTipoConfigStorage);overload;
-    constructor Create;overload;
+    constructor Create(TipoConfiguracao: TTipoConfigStorage);
     destructor Destroy; override;
-    class function New(TipoConfiguracao: TTipoConfigStorage): iStorageSettings; overload;
-    class function New: iStorageSettings; overload;
+    class function New(TipoConfiguracao: TTipoConfigStorage): iStorageSettings;
   end;
 
 implementation
@@ -110,8 +108,8 @@ end;
 
 function TStorageSettings.InserirNoBanco: string;
 begin
-  dmStorageSettings.TabConfiguracaoArmazenamento.Insert;
 
+  dmStorageSettings.TabConfiguracaoArmazenamento.Insert;
   dmStorageSettings.TabConfiguracaoArmazenamento.FieldByName('Diretorio')
     .AsString := FDiretorio;
   dmStorageSettings.TabConfiguracaoArmazenamento.FieldByName('Servidor')
@@ -130,13 +128,7 @@ begin
   else
     dmStorageSettings.TabConfiguracaoArmazenamento.FieldByName
       ('TipoConfiguracao').AsString := 'Local';
-
   dmStorageSettings.TabConfiguracaoArmazenamento.Post;
-end;
-
-class function TStorageSettings.New: iStorageSettings;
-begin
-  Result:= Self.Create;
 end;
 
 function TStorageSettings.BuscarDados(aCodigo: string): iStorageSettings;
@@ -174,10 +166,6 @@ end;
 function TStorageSettings.Codigo: string;
 begin
   Result := FCodigo;
-end;
-
-constructor TStorageSettings.Create;
-begin
 end;
 
 constructor TStorageSettings.Create(TipoConfiguracao: TTipoConfigStorage);

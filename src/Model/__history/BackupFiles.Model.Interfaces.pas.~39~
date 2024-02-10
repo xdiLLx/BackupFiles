@@ -17,7 +17,7 @@ type
     function CodigoRotina: string; overload;
     function Codigo: string;
     function CodigoInterno: integer;
-    function BuscarDados(CodigoItem:string): iBackupItem;
+    function BuscarDados(aCodigo: string): iBackupItem;
     function Salvar: iBackupItem;
   end;
 
@@ -36,6 +36,7 @@ type
     function Porta: integer; overload;
     function TipoConfiguracao(Value: TTipoConfigStorage): iStorageSettings; overload;
     function TipoConfiguracao: TTipoConfigStorage; overload;
+    function Porta: integer; overload;
     function BuscarDados(aCodigo: string): iStorageSettings;
     function Salvar: iStorageSettings;
     function Codigo: string;

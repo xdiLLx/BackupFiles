@@ -14,7 +14,6 @@ type
   iControllerStorageSettings = interface
     ['{74BC59B1-D23D-4BF3-9DC2-D7E6D69DAD9F}']
     function Item(TipoConfig: TTipoConfigStorage): iStorageSettings;
-    function BuscarConfiguracao(CodigoRotina:string): iStorageSettings;
   end;
 
   iControllerBackupItem = interface

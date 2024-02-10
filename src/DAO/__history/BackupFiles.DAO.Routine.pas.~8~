@@ -22,7 +22,6 @@ type
   TDMRoutine = class(TDataModule)
     TabRotina: TFDQuery;
     TabRotinaFiltrada: TFDQuery;
-    BuscaItensBackup: TFDQuery;
   private
     { Private declarations }
   public

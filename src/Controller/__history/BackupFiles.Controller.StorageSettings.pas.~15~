@@ -16,7 +16,7 @@ type
     destructor Destroy; override;
     class function New: iControllerStorageSettings;
     function Item(TipoConfig: TTipoConfigStorage): iStorageSettings;
-    function BuscarConfiguracao(CodigoRotina:string): iStorageSettings;
+    function BuscarConfiguracao(CodigoRotina:integer): iStorageSettings;
   end;
 
 implementation
@@ -26,9 +26,9 @@ implementation
 uses BackupFiles.Model.StorageSettings;
 
 function TControllerStorageSettings.BuscarConfiguracao(
-  CodigoRotina: string): iStorageSettings;
+  CodigoRotina: integer): iStorageSettings;
 begin
-  Result := Self.New.BuscarConfiguracao(CodigoRotina)
+
 end;
 
 constructor TControllerStorageSettings.Create;

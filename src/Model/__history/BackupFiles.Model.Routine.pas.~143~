@@ -113,7 +113,6 @@ begin
   DMRoutine.BuscaItensBackup.Open;
 
   FItemLista.Clear;
-  DMRoutine.BuscaItensBackup.First;
   while not DMRoutine.BuscaItensBackup.Eof do
   begin
     FItemLista.Add(

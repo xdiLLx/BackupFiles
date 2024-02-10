@@ -113,7 +113,6 @@ begin
   DMRoutine.BuscaItensBackup.Open;
 
   FItemLista.Clear;
-  DMRoutine.BuscaItensBackup.First;
   while not DMRoutine.BuscaItensBackup.Eof do
   begin
     FItemLista.Add(
@@ -148,7 +147,7 @@ begin
     ('CodigoRotina').AsString;
   FCodigo := DMRoutine.TabRotinaFiltrada.FieldByName('Codigo').AsString;
   FSettings := TControllerStorageSettings.New.BuscarConfiguracao(lCodigoConfig);
-  BuscaItensRotina;
+  FItemLista := BuscaItensRotina;
 
   Result := Self;
 end;

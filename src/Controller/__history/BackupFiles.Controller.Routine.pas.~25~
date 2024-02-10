@@ -35,7 +35,7 @@ end;
 
 function TControllerRoutine.Item: iRoutine;
 begin
-  Result := TRoutine.New;
+
 end;
 
 class function TControllerRoutine.New: iControllerRoutine;

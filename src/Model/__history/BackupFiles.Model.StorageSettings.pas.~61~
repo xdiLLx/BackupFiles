@@ -178,6 +178,7 @@ end;
 
 constructor TStorageSettings.Create;
 begin
+
 end;
 
 constructor TStorageSettings.Create(TipoConfiguracao: TTipoConfigStorage);

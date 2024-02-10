@@ -16,7 +16,6 @@ type
     destructor Destroy; override;
     class function New: iControllerStorageSettings;
     function Item(TipoConfig: TTipoConfigStorage): iStorageSettings;
-    function BuscarConfiguracao(CodigoRotina:string): iStorageSettings;
   end;
 
 implementation
@@ -24,12 +23,6 @@ implementation
 { TControllerStorageSettings }
 
 uses BackupFiles.Model.StorageSettings;
-
-function TControllerStorageSettings.BuscarConfiguracao(
-  CodigoRotina: string): iStorageSettings;
-begin
-  Result := Self.New.BuscarConfiguracao(CodigoRotina)
-end;
 
 constructor TControllerStorageSettings.Create;
 begin
@@ -45,7 +38,7 @@ end;
 function TControllerStorageSettings.Item(
   TipoConfig: TTipoConfigStorage): iStorageSettings;
 begin
-  Result:= TStorageSettings.New(TipoConfig);
+  Result:=
 end;
 
 class function TControllerStorageSettings.New: iControllerStorageSettings;

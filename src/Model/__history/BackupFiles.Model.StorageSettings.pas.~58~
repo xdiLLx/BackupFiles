@@ -38,8 +38,7 @@ type
     function BuscarDados(aCodigo: string): iStorageSettings;
     function Salvar: iStorageSettings;
   public
-    constructor Create(TipoConfiguracao: TTipoConfigStorage);overload;
-    constructor Create;overload;
+    constructor Create(TipoConfiguracao: TTipoConfigStorage);
     destructor Destroy; override;
     class function New(TipoConfiguracao: TTipoConfigStorage): iStorageSettings; overload;
     class function New: iStorageSettings; overload;
@@ -134,11 +133,6 @@ begin
   dmStorageSettings.TabConfiguracaoArmazenamento.Post;
 end;
 
-class function TStorageSettings.New: iStorageSettings;
-begin
-  Result:= Self.Create;
-end;
-
 function TStorageSettings.BuscarDados(aCodigo: string): iStorageSettings;
 begin
   if (aCodigo.IsEmpty) or (Length(aCodigo) <> 25) then
@@ -174,10 +168,6 @@ end;
 function TStorageSettings.Codigo: string;
 begin
   Result := FCodigo;
-end;
-
-constructor TStorageSettings.Create;
-begin
 end;
 
 constructor TStorageSettings.Create(TipoConfiguracao: TTipoConfigStorage);

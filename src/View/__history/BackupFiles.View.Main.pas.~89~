@@ -69,13 +69,6 @@ procedure TV.autocompletarClick(Sender: TObject);
 begin
   edtcaminho.Text:= 'TESTE DE ROTINA';
   NumberBox1.Value:= 1;
-  ComboBox1.ItemIndex:= 1;
-  edit1.Text:= 'C:\Users\GabrielDill\Downloads\Teste de Backup\';
-  edit2.Text:= 'gabrieldill.com';
-  edit3.Text := 'root';
-  Edit4.Text := '4321';
-  Edit5.Text := '21';
-  Edit7.Text := '1234';
 end;
 
 procedure TV.Button1Click(Sender: TObject);
@@ -85,8 +78,9 @@ var
   lConfig: iStorageSettings;
 begin
   try
-    lRotina := TControllerRoutine.New.Item.Horario(TimeEdit1.Time)
-      .TotalBackupsSalvos(Trunc(NumberBox1.Value)).Descricao(edtcaminho.Text);
+    lRotina := TControllerRoutine.New.Item;
+    lRotina.Horario(TimeEdit1.Time)
+      .TotalBackupsSalvos(Trunc(NumberBox1.Value));
 
     case ComboBox1.ItemIndex of
       0:
@@ -109,7 +103,7 @@ begin
     lConfig.Salvar;
     lRotina.Salvar;
   finally
-    ShowMessage('Rotina Criada com Sucesso')
+
   end;
 
 end;

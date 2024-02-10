@@ -185,13 +185,6 @@ object V: TV
     Size.PlatformDefault = False
     TextPrompt = 'Senha de Arquivo'
   end
-  object autocompletar: TButton
-    Position.X = 617.000000000000000000
-    Position.Y = 8.000000000000000000
-    TabOrder = 21
-    Text = 'autocompletar'
-    OnClick = autocompletarClick
-  end
   object OpenDialog1: TOpenDialog
     Left = 496
     Top = 16

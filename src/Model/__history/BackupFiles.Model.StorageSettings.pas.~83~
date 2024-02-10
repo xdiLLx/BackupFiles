@@ -47,6 +47,7 @@ type
     destructor Destroy; override;
     class function New(TipoConfiguracao: TTipoConfigStorage)
       : iStorageSettings; overload;
+
   end;
 
 implementation
@@ -101,8 +102,6 @@ begin
     .AsInteger := FPorta;
   dmStorageSettings.TabConfiguracaoArmazenamentoFiltrada.FieldByName('Codigo')
     .AsString := FCodigo;
-  dmStorageSettings.TabConfiguracaoArmazenamento.FieldByName('SenhaArquivo')
-    .AsString := FSenhaDeArquivo;
   if FTipoConfiguracao = FTP then
     dmStorageSettings.TabConfiguracaoArmazenamentoFiltrada.FieldByName
       ('TipoConfiguracao').AsString := 'FTP'
@@ -130,8 +129,6 @@ begin
     := FPorta;
   dmStorageSettings.TabConfiguracaoArmazenamento.FieldByName('Codigo').AsString
     := FCodigo;
-  dmStorageSettings.TabConfiguracaoArmazenamento.FieldByName('SenhaArquivo')
-    .AsString := FSenhaDeArquivo;
   if FTipoConfiguracao = FTP then
     dmStorageSettings.TabConfiguracaoArmazenamento.FieldByName
       ('TipoConfiguracao').AsString := 'FTP'
@@ -169,8 +166,6 @@ begin
     ('Porta').AsInteger;
   FCodigo := dmStorageSettings.TabConfiguracaoArmazenamentoFiltrada.FieldByName
     ('Codigo').AsString;
-  FSenhaDeArquivo := dmStorageSettings.TabConfiguracaoArmazenamento.FieldByName
-    ('SenhaArquivo').AsString;
 
   if dmStorageSettings.TabConfiguracaoArmazenamentoFiltrada.FieldByName
     ('TipoConfiguracao').AsString = 'FTP' then

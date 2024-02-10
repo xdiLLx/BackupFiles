@@ -269,7 +269,6 @@ begin
     raise Exception.Create
       ('O Número de acumulo de backups deve ser superior a zero');
   FTotalBackups := Value;
-  Result:= Self;
 end;
 
 function TRoutine.TotalBackupsSalvos: Integer;

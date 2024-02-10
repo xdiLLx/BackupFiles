@@ -3,7 +3,7 @@ program BackupFiles;
 uses
   System.StartUpCopy,
   FMX.Forms,
-  BackupFiles.View.Main in 'src\View\BackupFiles.View.Main.pas' {V},
+  BackupFiles.View.Main in 'src\View\BackupFiles.View.Main.pas' {ViewMain},
   BackupFiles.Model.BackupItem in 'src\Model\BackupFiles.Model.BackupItem.pas',
   BackupFiles.Controller.BackupItem in 'src\Controller\BackupFiles.Controller.BackupItem.pas',
   BackupFiles.Model.Routine in 'src\Model\BackupFiles.Model.Routine.pas',
@@ -22,7 +22,7 @@ uses
 begin
   Application.Initialize;
   ReportMemoryLeaksonshutdown := true;
-  Application.CreateForm(TV, V);
+  Application.CreateForm(TViewMain, ViewMain);
   Application.CreateForm(TDMRoutine, DMRoutine);
   Application.CreateForm(TDM, DM);
   Application.CreateForm(TdmBackupItem, dmBackupItem);

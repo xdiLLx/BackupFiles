@@ -17,7 +17,6 @@ type
     procedure AtualizarNoBanco;
     procedure InserirNoBanco;
     procedure BuscaItensRotina;
-    procedure SalvarItens;
   private
     { Campos privados }
     FCodigo: string;
@@ -40,6 +39,7 @@ type
     function Descricao(Value: string): iRoutine; overload;
     function BuscarDados(aCodigo: string): iRoutine;
     function Salvar: iRoutine;
+    procedure SalvarItens;
   public
     constructor Create;
     destructor Destroy; override;
@@ -114,9 +114,10 @@ begin
 
   for var Item in FItemLista do
   begin
-    Item.Salvar;
+     item.Salvar;
   end;
 end;
+
 
 procedure TRoutine.BuscaItensRotina;
 begin
@@ -179,6 +180,7 @@ end;
 
 constructor TRoutine.Create;
 begin
+  inherited;
   FCodigo := GenerateUniqueCode;
   FItemLista := TList<iBackupItem>.Create;
 end;
@@ -269,7 +271,6 @@ begin
     raise Exception.Create
       ('O Número de acumulo de backups deve ser superior a zero');
   FTotalBackups := Value;
-  Result:= Self;
 end;
 
 function TRoutine.TotalBackupsSalvos: Integer;

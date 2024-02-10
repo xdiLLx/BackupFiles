@@ -109,7 +109,7 @@ begin
     lConfig.Salvar;
     lRotina.Salvar;
   finally
-    ShowMessage('Rotina Criada com Sucesso')
+
   end;
 
 end;

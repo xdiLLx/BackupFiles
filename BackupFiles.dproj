@@ -193,7 +193,7 @@
             <MainSource>MainSource</MainSource>
         </DelphiCompile>
         <DCCReference Include="src\View\BackupFiles.View.Main.pas">
-            <Form>ViewMain</Form>
+            <Form>V</Form>
             <FormType>fmx</FormType>
         </DCCReference>
         <DCCReference Include="src\Model\BackupFiles.Model.BackupItem.pas"/>

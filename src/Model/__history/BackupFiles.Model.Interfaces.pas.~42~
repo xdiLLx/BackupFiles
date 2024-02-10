@@ -36,8 +36,6 @@ type
     function Porta: integer; overload;
     function TipoConfiguracao(Value: TTipoConfigStorage): iStorageSettings; overload;
     function TipoConfiguracao: TTipoConfigStorage; overload;
-    function SenhaDeArquivo(Value: string): iStorageSettings; overload;
-    function SenhaDeArquivo: string; overload;
     function BuscarDados(aCodigo: string): iStorageSettings;
     function Salvar: iStorageSettings;
     function Codigo: string;

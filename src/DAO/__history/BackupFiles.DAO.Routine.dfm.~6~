@@ -13,7 +13,7 @@ object DMRoutine: TDMRoutine
     SQL.Strings = (
       'select * from rotina r'
       'where r.codigo = :codigo')
-    Left = 128
+    Left = 120
     Top = 16
     ParamData = <
       item

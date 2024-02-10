@@ -21,7 +21,6 @@ type
     function Salvar: iBackupItem;
   end;
 
-  TTipoConfigStorage = (FTP,Local);
   iStorageSettings = interface
     ['{3478CAE7-BBDB-402C-BEDC-DF8A0B1DDAD8}']
     function Diretorio(Value: string): iStorageSettings; overload;
@@ -34,12 +33,6 @@ type
     function Senha: string; overload;
     function Porta(Value: integer): iStorageSettings; overload;
     function Porta: integer; overload;
-    function TipoConfiguracao(Value: TTipoConfigStorage): iStorageSettings; overload;
-    function TipoConfiguracao: TTipoConfigStorage; overload;
-    function Porta: integer; overload;
-    function BuscarDados(aCodigo: string): iStorageSettings;
-    function Salvar: iStorageSettings;
-    function Codigo: string;
   end;
 
   iRoutine = interface
@@ -56,10 +49,7 @@ type
     function Configuracao: iStorageSettings; overload;
     function Descricao: string; overload;
     function Descricao(Value: string): iRoutine; overload;
-    function BuscarDados(aCodigo: string): iRoutine;
-    function Salvar: iRoutine;
   end;
-
 
 implementation
 

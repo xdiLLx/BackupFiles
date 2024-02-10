@@ -30,8 +30,7 @@ type
     function Porta(Value: integer): iStorageSettings; overload;
     function Porta: integer; overload;
     function Codigo: string;
-    function TipoConfiguracao(Value: TTipoConfigStorage)
-      : iStorageSettings; overload;
+    function TipoConfiguracao(Value: TTipoConfigStorage): iStorageSettings; overload;
     function TipoConfiguracao: TTipoConfigStorage; overload;
     function BuscarDados(aCodigo: string): iStorageSettings;
     function Salvar: iStorageSettings;
@@ -78,28 +77,24 @@ begin
     raise Exception.Create('Código de configuração inválido para busca');
 
   dmStorageSettings.TabConfiguracaoArmazenamentoFiltrada.Close;
-  dmStorageSettings.TabConfiguracaoArmazenamentoFiltrada.ParamByName('codigo')
-    .AsString := aCodigo;
+  dmStorageSettings.TabConfiguracaoArmazenamentoFiltrada.ParamByName('codigo').AsString := aCodigo;
   dmStorageSettings.TabConfiguracaoArmazenamentoFiltrada.Open;
 
-  FDiretorio := dmStorageSettings.TabConfiguracaoArmazenamentoFiltrada.
-    FieldByName('Diretorio').AsString;
-  FServidor := dmStorageSettings.TabConfiguracaoArmazenamentoFiltrada.
-    FieldByName('Servidor').AsString;
+  FDiretorio := dmStorageSettings.TabConfiguracaoArmazenamentoFiltrada.FieldByName('Diretorio').AsString;
+  FServidor := dmStorageSettings.TabConfiguracaoArmazenamentoFiltrada.FieldByName('Servidor')
+    .AsString;
   FUsuario := dmStorageSettings.TabConfiguracaoArmazenamentoFiltrada.FieldByName
     ('Usuario').AsString;
   FSenha := dmStorageSettings.TabConfiguracaoArmazenamentoFiltrada.FieldByName
     ('Senha').AsString;
-  FPorta := dmStorageSettings.TabConfiguracaoArmazenamentoFiltrada.FieldByName
-    ('Porta').AsInteger;
-  FCodigo := dmStorageSettings.TabConfiguracaoArmazenamentoFiltrada.FieldByName
-    ('Codigo').AsString;
+  FPorta := dmStorageSettings.TabConfiguracaoArmazenamentoFiltrada.FieldByName('Porta')
+    .AsInteger;
+  FCodigo := dmStorageSettings.TabConfiguracaoArmazenamentoFiltrada.FieldByName('Codigo').AsString;
 
-  if dmStorageSettings.TabConfiguracaoArmazenamentoFiltrada.FieldByName
-    ('TipoConfiguracao').AsString = 'FTP' then
-    FTipoConfiguracao := FTP
+  if dmStorageSettings.TabConfiguracaoArmazenamentoFiltrada.FieldByName('TipoConfiguracao').AsString = 'FTP' then
+  FTipoConfiguracao := FTP;
   else
-    FTipoConfiguracao := Local;
+  FTipoConfiguracao := Local;
 
   Result := Self;
 end;
@@ -135,8 +130,7 @@ begin
   Result := FDiretorio;
 end;
 
-class function TStorageSettings.New(TipoConfiguracao: TTipoConfigStorage)
-  : iStorageSettings;
+class function TStorageSettings.New(TipoConfiguracao: TTipoConfigStorage): iStorageSettings;
 begin
   Result := Self.Create(TipoConfiguracao);
 end;
@@ -175,14 +169,14 @@ end;
 
 function TStorageSettings.TipoConfiguracao: TTipoConfigStorage;
 begin
-  Result := FTipoConfiguracao;
+   Result:= FTipoConfiguracao;
 end;
 
-function TStorageSettings.TipoConfiguracao(Value: TTipoConfigStorage)
-  : iStorageSettings;
+function TStorageSettings.TipoConfiguracao(
+  Value: TTipoConfigStorage): iStorageSettings;
 begin
-  FTipoConfiguracao := Value;
-  Result := Self;
+  FTipoConfiguracao:= Value;
+  Result:= Self;
 end;
 
 function TStorageSettings.Servidor(Value: string): iStorageSettings;

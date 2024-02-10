@@ -85,23 +85,24 @@ end;
 
 function TRoutine.AtualizarNoBanco: string;
 begin
-  DMRoutine.TabRotinaFiltrada.Close;
-  DMRoutine.TabRotinaFiltrada.ParamByName('codigo').AsString := Self.FCodigo;
-  DMRoutine.TabRotinaFiltrada.Open;
+  DMRoutine.TabItemBackupFiltrada.Close;
+  DMRoutine.TabItemBackupFiltrada.ParamByName('codigo').AsString := Self.FCodigo;
+  DMRoutine.TabItemBackupFiltrada.Open;
 
-  DMRoutine.TabRotinaFiltrada.Edit;
-  DMRoutine.TabRotinaFiltrada.FieldByName('Horario').AsDateTime := FHorario.GetTime;
-  DMRoutine.TabRotinaFiltrada.FieldByName('Total_backup').AsString := FTotalBackups;
-  DMRoutine.TabRotinaFiltrada.FieldByName('CodigoConfiguracao').AsString
-    := FSettings;
-  DMRoutine.TabRotinaFiltrada.FieldByName('CodigoRotina').AsString :=
+  DMRoutine.TabItemBackupFiltrada.Edit;
+  DMRoutine.TabItemBackupFiltrada.FieldByName('Nome').AsString := FNome;
+  DMRoutine.TabItemBackupFiltrada.FieldByName('Caminho').AsString :=
+    FCaminho;
+  DMRoutine.TabItemBackupFiltrada.FieldByName('UltimaModificacao').AsDateTime
+    := FUltimaModificacao;
+  DMRoutine.TabItemBackupFiltrada.FieldByName('CodigoRotina').AsString :=
     FCodigoRotina;
-  DMRoutine.TabRotinaFiltrada.FieldByName('Tamanho').AsInteger
+  DMRoutine.TabItemBackupFiltrada.FieldByName('Tamanho').AsInteger
     := FTamanho;
-  DMRoutine.TabRotinaFiltrada.FieldByName('Codigo').AsString := FCodigo;
-  DMRoutine.TabRotinaFiltrada.FieldByName('id').AsInteger :=
+  DMRoutine.TabItemBackupFiltrada.FieldByName('Codigo').AsString := FCodigo;
+  DMRoutine.TabItemBackupFiltrada.FieldByName('id').AsInteger :=
     FCodigoInterno;
-  DMRoutine.TabRotinaFiltrada.Post;
+  DMRoutine.TabItemBackupFiltrada.Post;
 end;
 
 function TRoutine.BuscarDados(aCodigo: string): iRoutine;

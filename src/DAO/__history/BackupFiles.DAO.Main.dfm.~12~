@@ -8,7 +8,6 @@ object DM: TDM
         'Database=E:\Meus Projetos\InstaBackupFiles\resources\BackupFiles' +
         '.db'
       'DriverID=SQLite')
-    Connected = True
     LoginPrompt = False
     Left = 40
     Top = 16

@@ -5,15 +5,12 @@ interface
 uses
   BackupFiles.Controller.Routine,
   BackupFiles.Model.Interfaces,
-  System.Generics.Collections,
-  BackupFiles.DAO.Routine;
+  System.Generics.Collections;
 
 type
   TRoutine = class(TInterfacedObject, iRoutine)
   strict private
     function GenerateUniqueCode: string;
-    function AtualizarNoBanco: string;
-    function InserirNoBanco: string;
   private
     { Campos privados }
     FCodigo: string;
@@ -83,27 +80,6 @@ begin
   Result := Self;
 end;
 
-function TRoutine.AtualizarNoBanco: string;
-begin
-  DMRoutine.TabRotinaFiltrada.Close;
-  DMRoutine.TabRotinaFiltrada.ParamByName('codigo').AsString := Self.FCodigo;
-  DMRoutine.TabRotinaFiltrada.Open;
-
-  DMRoutine.TabRotinaFiltrada.Edit;
-  DMRoutine.TabRotinaFiltrada.FieldByName('Horario').AsDateTime := FHorario.GetTime;
-  DMRoutine.TabRotinaFiltrada.FieldByName('Total_backup').AsString := FTotalBackups;
-  DMRoutine.TabRotinaFiltrada.FieldByName('CodigoConfiguracao').AsString
-    := FSettings;
-  DMRoutine.TabRotinaFiltrada.FieldByName('CodigoRotina').AsString :=
-    FCodigoRotina;
-  DMRoutine.TabRotinaFiltrada.FieldByName('Tamanho').AsInteger
-    := FTamanho;
-  DMRoutine.TabRotinaFiltrada.FieldByName('Codigo').AsString := FCodigo;
-  DMRoutine.TabRotinaFiltrada.FieldByName('id').AsInteger :=
-    FCodigoInterno;
-  DMRoutine.TabRotinaFiltrada.Post;
-end;
-
 function TRoutine.BuscarDados(aCodigo: string): iRoutine;
 begin
 
@@ -154,11 +130,6 @@ end;
 function TRoutine.Horario: TDateTime;
 begin
   Result := FHorario;
-end;
-
-function TRoutine.InserirNoBanco: string;
-begin
-
 end;
 
 function TRoutine.ListarItens: TList<iBackupItem>;

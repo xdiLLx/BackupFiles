@@ -1,0 +1,8 @@
+object dmStorageSettings: TdmStorageSettings
+  Height = 480
+  Width = 640
+  object FDQuery1: TFDQuery
+    Left = 24
+    Top = 24
+  end
+end

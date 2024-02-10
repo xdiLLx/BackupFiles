@@ -17,7 +17,7 @@ type
 
   iControllerBackupItem = interface
     ['{E1151506-5D0C-4FD8-A0C9-09C99DF1E15C}']
-    function Item(CodigoRotina:string): iBackupItem;
+    function Item: iBackupItem;
   end;
 
 implementation

@@ -14,8 +14,7 @@ uses
   BackupFiles.Controller.Interfaces in 'src\Controller\BackupFiles.Controller.Interfaces.pas',
   BackupFiles.DAO.Routine in 'src\DAO\BackupFiles.DAO.Routine.pas' {DMRoutine: TDataModule},
   BackupFiles.DAO.Main in 'src\DAO\BackupFiles.DAO.Main.pas' {DM: TDataModule},
-  BackupFiles.DAO.BackupItem in 'src\DAO\BackupFiles.DAO.BackupItem.pas' {dmBackupItem: TDataModule},
-  BackupFiles.DAO.StorageSettings in 'src\DAO\BackupFiles.DAO.StorageSettings.pas' {dmStorageSettings: TDataModule};
+  BackupFiles.DAO.BackupItem in 'src\DAO\BackupFiles.DAO.BackupItem.pas' {dmBackupItem: TDataModule};
 
 {$R *.res}
 
@@ -26,7 +25,6 @@ begin
   Application.CreateForm(TDMRoutine, DMRoutine);
   Application.CreateForm(TDM, DM);
   Application.CreateForm(TdmBackupItem, dmBackupItem);
-  Application.CreateForm(TdmStorageSettings, dmStorageSettings);
   Application.Run;
 
 end.

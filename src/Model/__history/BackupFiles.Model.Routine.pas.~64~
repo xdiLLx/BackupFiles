@@ -90,10 +90,11 @@ begin
   DMRoutine.TabRotinaFiltrada.Open;
 
   DMRoutine.TabRotinaFiltrada.Edit;
-  DMRoutine.TabRotinaFiltrada.FieldByName('Horario').AsDateTime := FHorario.GetTime;
-  DMRoutine.TabRotinaFiltrada.FieldByName('Total_backup').AsString := FTotalBackups;
-  DMRoutine.TabRotinaFiltrada.FieldByName('CodigoConfiguracao').AsString
-    := FSettings;
+  DMRoutine.TabRotinaFiltrada.FieldByName('Nome').AsString := FNome;
+  DMRoutine.TabRotinaFiltrada.FieldByName('Caminho').AsString :=
+    FCaminho;
+  DMRoutine.TabRotinaFiltrada.FieldByName('UltimaModificacao').AsDateTime
+    := FUltimaModificacao;
   DMRoutine.TabRotinaFiltrada.FieldByName('CodigoRotina').AsString :=
     FCodigoRotina;
   DMRoutine.TabRotinaFiltrada.FieldByName('Tamanho').AsInteger

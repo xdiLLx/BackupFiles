@@ -36,9 +36,9 @@ begin
   inherited;
 end;
 
-function TControllerBackupItem.Item(CodigoRotina:string): iBackupItem;
+function TControllerBackupItem.Item: iBackupItem;
 begin
-   Result := TBackupItem.New(CodigoRotina);
+   Result := TBackupItem.New;
 end;
 
 class function TControllerBackupItem.New: iControllerBackupItem;

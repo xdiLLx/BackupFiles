@@ -36,7 +36,7 @@ procedure TViewMain.Button1Click(Sender: TObject);
 var
   Item: iBackupItem;
 begin
-  Item := TControllerBackupItem.New.Item(Edit1.Text);
+  Item := TControllerBackupItem.New.Item;
   Item.Caminho(edtcaminho.Text).Salvar;
   str := Item.Codigo;
   ShowMessage(Item.Caminho);
@@ -46,7 +46,7 @@ procedure TViewMain.Button2Click(Sender: TObject);
 var
   Item: iBackupItem;
 begin
-  Item := TControllerBackupItem.New.Item(Edit1.Text).BuscarDados(Edit1.Text);
+  Item := TControllerBackupItem.New.Item.BuscarDados(Edit1.Text);
   Item.Salvar;
   ShowMessage(Item.Caminho);
 end;

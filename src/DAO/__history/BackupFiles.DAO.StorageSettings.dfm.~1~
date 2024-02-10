@@ -1,0 +1,4 @@
+object dmStorageSettings: TdmStorageSettings
+  Height = 480
+  Width = 640
+end

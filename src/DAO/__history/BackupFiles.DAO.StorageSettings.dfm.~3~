@@ -1,0 +1,14 @@
+object dmStorageSettings: TdmStorageSettings
+  Height = 480
+  Width = 659
+  object TabConfiguracaoArmazenamento: TFDQuery
+    SQL.Strings = (
+      'select * from configuracao_armazenamento')
+    Left = 80
+    Top = 24
+  end
+  object TabConfiguracaoArmazenamentoFiltrada: TFDQuery
+    Left = 296
+    Top = 24
+  end
+end

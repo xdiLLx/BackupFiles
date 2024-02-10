@@ -127,6 +127,7 @@ begin
   dmBackupItem.TabItemBackupFiltrada.FieldByName('id').AsInteger :=
     FCodigoInterno;
   dmBackupItem.TabItemBackupFiltrada.Post;
+
 end;
 
 function TBackupItem.BuscarDados(aCodigo: string): iBackupItem;
@@ -187,7 +188,6 @@ end;
 constructor TBackupItem.Create(CodigoRotina:string);
 begin
   FCodigo := GenerateUniqueCode;
-  FCodigoRotina:= CodigoRotina;
 end;
 
 destructor TBackupItem.Destroy;
@@ -198,7 +198,7 @@ end;
 
 class function TBackupItem.New(CodigoRotina:string): iBackupItem;
 begin
-  Result := Self.Create(CodigoRotina);
+  Result := Self.Create;
 end;
 
 function TBackupItem.Nome: string;

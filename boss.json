@@ -1,0 +1,12 @@
+{
+	"name": "BackupFiles",
+	"description": "",
+	"version": "1.0.0",
+	"homepage": "",
+	"mainsrc": "./src",
+	"projects": [],
+	"dependencies": {
+		"https://github.com/xdiLLx/AbbreviaSource": ">0.0.0",
+		"https://github.com/xdillx/bibliotecagd--fmx": ">0.0.0"
+	}
+}

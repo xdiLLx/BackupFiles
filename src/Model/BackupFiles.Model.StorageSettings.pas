@@ -40,13 +40,13 @@ type
     function TipoConfiguracao: TTipoConfigStorage; overload;
     function BuscarDados(aCodigo: string): iStorageSettings;
     function Salvar: iStorageSettings;
-    class function New: iStorageSettings; overload;
   public
     constructor Create(TipoConfiguracao: TTipoConfigStorage); overload;
     constructor Create; overload;
     destructor Destroy; override;
     class function New(TipoConfiguracao: TTipoConfigStorage)
       : iStorageSettings; overload;
+    class function New: iStorageSettings; overload;
   end;
 
 implementation
@@ -169,7 +169,7 @@ begin
     ('Porta').AsInteger;
   FCodigo := dmStorageSettings.TabConfiguracaoArmazenamentoFiltrada.FieldByName
     ('Codigo').AsString;
-  FSenhaDeArquivo := dmStorageSettings.TabConfiguracaoArmazenamento.FieldByName
+  FSenhaDeArquivo := dmStorageSettings.TabConfiguracaoArmazenamentoFiltrada.FieldByName
     ('SenhaArquivo').AsString;
 
   if dmStorageSettings.TabConfiguracaoArmazenamentoFiltrada.FieldByName
@@ -196,6 +196,7 @@ constructor TStorageSettings.Create(TipoConfiguracao: TTipoConfigStorage);
 begin
   FCodigo := GenerateUniqueCode;
   FSenhaDeArquivo := '';
+  FTipoConfiguracao := TipoConfiguracao;
 end;
 
 destructor TStorageSettings.Destroy;

@@ -8,7 +8,11 @@ uses
   System.Generics.Collections,
   BackupFiles.DAO.Routine,
   BackupFiles.Controller.StorageSettings,
-  BackupFiles.Controller.BackupItem;
+  BackupFiles.Controller.BackupItem,
+  AbZipper,
+  AbArcTyp,
+  AbUtils,
+  AbZipKit, System.IOUtils, System.Classes;
 
 type
   TRoutine = class(TInterfacedObject, iRoutine)
@@ -18,6 +22,9 @@ type
     procedure InserirNoBanco;
     procedure BuscaItensRotina;
     procedure SalvarItens;
+    procedure IniciarBackupLocal;
+    procedure IniciarBackupFTP;
+    procedure VerificarUltimosBackups;
   private
     { Campos privados }
     FCodigo: string;
@@ -40,6 +47,7 @@ type
     function Descricao(Value: string): iRoutine; overload;
     function BuscarDados(aCodigo: string): iRoutine;
     function Salvar: iRoutine;
+    function IniciarBackup: iRoutine;
   public
     constructor Create;
     destructor Destroy; override;
@@ -153,7 +161,7 @@ begin
   FTotalBackups := DMRoutine.TabRotinaFiltrada.FieldByName('Total_Backup')
     .AsInteger;
   lCodigoConfig := DMRoutine.TabRotinaFiltrada.FieldByName
-    ('CodigoRotina').AsString;
+    ('CodigoConfiguracao').AsString;
   FCodigo := DMRoutine.TabRotinaFiltrada.FieldByName('Codigo').AsString;
   FSettings := TControllerStorageSettings.New.BuscarConfiguracao(lCodigoConfig);
   BuscaItensRotina;
@@ -205,6 +213,73 @@ end;
 function TRoutine.Horario: TDateTime;
 begin
   Result := FHorario;
+end;
+
+function TRoutine.IniciarBackup: iRoutine;
+begin
+  if not Assigned(FSettings) then
+    raise Exception.Create
+      ('Não é possível iniciar backup sem uma configuração estabelecida');
+
+  if FSettings.TipoConfiguracao = FTP then
+    IniciarBackupFTP
+  else
+    IniciarBackupLocal;
+
+  Result := Self;
+end;
+
+procedure TRoutine.IniciarBackupFTP;
+begin
+
+end;
+
+procedure TRoutine.IniciarBackupLocal;
+var
+  lZipper: TAbZipper;
+  ArquivoTemporario: string;
+begin
+
+  lZipper := TAbZipper.Create(nil);
+  try
+    VerificarUltimosBackups;
+    // Defina o arquivo de destino para o arquivo ZIP
+    lZipper.FileName := FDescricao + ' - ' + FormatDateTime('dd-mm-yy',
+      Now) + '.zip';
+    //lZipper.BaseDirectory := FSettings.Diretorio;
+    lZipper.Version := FCodigo;
+    lZipper.StoreOptions := [soStripDrive, soStripPath];
+     if FSettings.SenhaDeArquivo <> '' then
+      lZipper.Password := FSettings.SenhaDeArquivo;
+    // Abra o arquivo ZIP
+    lZipper.OpenArchive(FSettings.Diretorio + lZipper.FileName);
+    // Defina a senha para o arquivo ZIP
+
+
+    ArquivoTemporario := TPath.GetTempPath;
+    // Adicione os arquivos à lista do ZIP
+    for var Item in FItemLista do
+    begin
+      ArquivoTemporario := ArquivoTemporario + ExtractFileName(Item.Caminho);
+      // Copia o arquivo para a pasta temporária
+      TFile.Copy(Item.Caminho, ArquivoTemporario, True);
+
+      // Adiciona o arquivo temporário ao ZIP
+      lZipper.AddFiles((ArquivoTemporario),
+        0);
+      lZipper.Save;
+      // Deleta o arquivo temporário após adicionar ao ZIP
+      TFile.Delete((ArquivoTemporario));
+    end;
+
+    lZipper.Save;
+    // Salve e feche o arquivo ZIP
+
+    lZipper.CloseArchive;
+  finally
+
+    lZipper.Free;
+  end;
 end;
 
 procedure TRoutine.InserirNoBanco;
@@ -269,12 +344,61 @@ begin
     raise Exception.Create
       ('O Número de acumulo de backups deve ser superior a zero');
   FTotalBackups := Value;
-  Result:= Self;
+  Result := Self;
 end;
 
 function TRoutine.TotalBackupsSalvos: Integer;
 begin
   Result := FTotalBackups;
+end;
+
+procedure TRoutine.VerificarUltimosBackups;
+var
+  lZipper: TAbZipper;
+  FileName: string;
+  lNumeroBackupsFeitos: Integer;
+  lListaBackups: TStringList;
+begin
+  lNumeroBackupsFeitos := 0;
+  lZipper := TAbZipper.Create(nil);
+  lListaBackups := TStringList.Create;
+  try
+    for var Item in TDirectory.GetFiles(FSettings.Diretorio, '*.zip') do
+    begin
+      lZipper.OpenArchive(Item);
+      //if lZipper.Version = FCodigo then
+      //begin
+        Inc(lNumeroBackupsFeitos);
+        lListaBackups.Add(Item);
+      //end;
+    end;
+
+    if lNumeroBackupsFeitos = FTotalBackups then
+    begin
+      var
+      OldestFile := lListaBackups[0];
+      var
+      OldestFileAge := FileAge(lListaBackups[0]);
+      var
+        lFileAge: Integer;
+
+      for var i := 0 to lListaBackups.Count - 1 do
+      begin
+        lFileAge := FileAge(lListaBackups[i]);
+        if lFileAge < OldestFileAge then
+        begin
+          OldestFile := lListaBackups[i];
+          OldestFileAge := lFileAge;
+        end;
+      end;
+
+      DeleteFile(OldestFile);
+    end;
+
+  finally
+    lZipper.Free;
+    lListaBackups.Free;
+  end;
 end;
 
 end.

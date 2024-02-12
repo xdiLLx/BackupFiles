@@ -28,7 +28,7 @@ uses BackupFiles.Model.StorageSettings;
 function TControllerStorageSettings.BuscarConfiguracao(
   CodigoRotina: string): iStorageSettings;
 begin
-  Result := Self.New.BuscarConfiguracao(CodigoRotina)
+  Result := TStorageSettings.New.BuscarDados(CodigoRotina);
 end;
 
 constructor TControllerStorageSettings.Create;

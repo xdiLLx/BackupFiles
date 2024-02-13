@@ -1,5 +1,4 @@
 object dmStorageSettings: TdmStorageSettings
-  OnCreate = DataModuleCreate
   Height = 480
   Width = 659
   object TabConfiguracaoArmazenamento: TFDQuery

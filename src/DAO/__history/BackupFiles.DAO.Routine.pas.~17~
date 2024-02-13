@@ -37,7 +37,9 @@ var
 implementation
 
 {%CLASSGROUP 'FMX.Controls.TControl'}
+
 {$R *.dfm}
+
 { TDMRoutine }
 
 procedure TDMRoutine.DataModuleCreate(Sender: TObject);
@@ -47,12 +49,12 @@ end;
 
 procedure TDMRoutine.VerificaCamposBanco;
 begin
-  DM.VerificaTabela('ROTINA');
-  DM.VerificaCampos('ROTINA', 'Codigo', 'TEXT(25)');
-  DM.VerificaCampos('ROTINA', 'Horario', 'TIME');
-  DM.VerificaCampos('ROTINA', 'Total_Backup', 'INTEGER');
-  DM.VerificaCampos('ROTINA', 'CodigoConfiguracao', 'TEXT(25)');
-  DM.VerificaCampos('ROTINA', 'Descricao', 'TEXT(50)');
+   DM.VerificaTabela('ROTINA');
+   DM.VerificaCampos('ROTINA','Codigo','TEXT(25)');
+   DM.VerificaCampos('ROTINA','Horario','TIME');
+   DM.VerificaCampos('ROTINA','Total_Backup','INTEGER');
+   DM.VerificaCampos('ROTINA','CodigoConfiguracao','TEXT(25)');
+   DM.VerificaCampos('ROTINA','Descricao','TEXT(50)');
 end;
 
 end.

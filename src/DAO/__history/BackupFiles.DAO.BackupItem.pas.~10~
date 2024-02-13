@@ -36,12 +36,10 @@ procedure TdmBackupItem.VerificaCamposBanco;
 begin
   DM.VerificaTabela('ITEMBACKUP');
   DM.VerificaCampos('ITEMBACKUP', 'Codigo', 'TEXT(25)');
-  DM.VerificaCampos('ITEMBACKUP', 'Nome', 'TEXT(50)');
-  DM.VerificaCampos('ITEMBACKUP', 'ID', 'INT');
-  DM.VerificaCampos('ITEMBACKUP', 'Caminho', 'TEXT(150)');
-  DM.VerificaCampos('ITEMBACKUP', 'UltimaModificacao', 'DATETIME');
-  DM.VerificaCampos('ITEMBACKUP', 'CodigoRotina', 'TEXT(25)');
-  DM.VerificaCampos('ITEMBACKUP', 'Tamanho', 'INT64');
+  DM.VerificaCampos('ITEMBACKUP', 'Horario', 'TIME');
+  DM.VerificaCampos('ITEMBACKUP', 'Total_Backup', 'INTEGER');
+  DM.VerificaCampos('ITEMBACKUP', 'CodigoConfiguracao', 'TEXT(25)');
+  DM.VerificaCampos('ITEMBACKUP', 'Descricao', 'TEXT(50)');
 end;
 
 {%CLASSGROUP 'FMX.Controls.TControl'}

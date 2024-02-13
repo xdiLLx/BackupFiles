@@ -1,4 +1,0 @@
-object dmRoutine: TdmRoutine
-  Height = 480
-  Width = 640
-end

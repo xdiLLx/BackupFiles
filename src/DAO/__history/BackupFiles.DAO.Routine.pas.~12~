@@ -1,0 +1,107 @@
+unit BackupFiles.DAO.Routine;
+
+interface
+
+uses
+  System.SysUtils,
+  System.Classes,
+  BackupFiles.DAO.Main,
+  FireDAC.Stan.Intf,
+  FireDAC.Stan.Option,
+  FireDAC.Stan.Param,
+  FireDAC.Stan.Error,
+  FireDAC.DatS,
+  FireDAC.Phys.Intf,
+  FireDAC.DApt.Intf,
+  FireDAC.Stan.Async,
+  FireDAC.DApt, Data.DB,
+  FireDAC.Comp.DataSet,
+  FireDAC.Comp.Client;
+
+type
+  TDMRoutine = class(TDataModule)
+    TabRotina: TFDQuery;
+    TabRotinaFiltrada: TFDQuery;
+    BuscaItensBackup: TFDQuery;
+  private
+    { Private declarations }
+    procedure VerificaCamposBanco;
+  public
+    { Public declarations }
+  end;
+
+var
+  DMRoutine: TDMRoutine;
+
+implementation
+
+{%CLASSGROUP 'FMX.Controls.TControl'}
+
+{$R *.dfm}
+
+{ TDMRoutine }
+
+procedure TDMRoutine.VerificaCamposBanco;
+begin
+  try
+
+    SqlAux.SQL.Text := 'SELECT * FROM CLIENTE LIMIT 1';
+    SqlAux.Open;
+    if SqlAux.FindField('CLI_BAIRRO') = nil then
+    begin
+      SqlAux.Close;
+      SqlAux.SQL.Text := 'ALTER TABLE CLIENTE ADD COLUMN CLI_BAIRRO TEXT(50)';
+      SqlAux.ExecSQL;
+    end;
+    if SqlAux.FindField('CLI_ENDERECO') = nil then
+    begin
+      SqlAux.Close;
+      SqlAux.SQL.Text := 'ALTER TABLE CLIENTE ADD COLUMN CLI_ENDERECO TEXT(100)';
+      SqlAux.ExecSQL;
+    end;
+    if SqlAux.FindField('CLI_NUMENDERECO') = nil then
+    begin
+      SqlAux.Close;
+      SqlAux.SQL.Text := 'ALTER TABLE CLIENTE ADD COLUMN CLI_NUMENDERECO TEXT(10)';
+      SqlAux.ExecSQL;
+    end;
+    if SqlAux.FindField('CLI_CIDADE') = nil then
+    begin
+      SqlAux.Close;
+      SqlAux.SQL.Text := 'ALTER TABLE CLIENTE ADD COLUMN CLI_CIDADE TEXT(50)';
+      SqlAux.ExecSQL;
+    end;
+    if SqlAux.FindField('CLI_PROFISSAO') = nil then
+    begin
+      SqlAux.Close;
+      SqlAux.SQL.Text := 'ALTER TABLE CLIENTE ADD COLUMN CLI_PROFISSAO TEXT(50)';
+      SqlAux.ExecSQL;
+    end;
+    if SqlAux.FindField('CLI_SEXO') = nil then
+    begin
+      SqlAux.Close;
+      SqlAux.SQL.Text := 'ALTER TABLE CLIENTE ADD COLUMN CLI_SEXO TEXT(20)';
+      SqlAux.ExecSQL;
+    end;
+    if SqlAux.FindField('CLI_FONE2') = nil then
+    begin
+      SqlAux.Close;
+      SqlAux.SQL.Text := 'ALTER TABLE CLIENTE ADD COLUMN CLI_FONE2 TEXT(20)';
+      SqlAux.ExecSQL;
+    end;
+    if SqlAux.FindField('CLI_COMPLE_ENDERECO') = nil then
+    begin
+      SqlAux.Close;
+      SqlAux.SQL.Text := 'ALTER TABLE CLIENTE ADD COLUMN CLI_COMPLE_ENDERECO TEXT(100)';
+      SqlAux.ExecSQL;
+    end;
+  except
+    on E: Exception do
+    begin
+      ShowMessage(E.Message);
+    end;
+  end;
+
+end;
+
+end.

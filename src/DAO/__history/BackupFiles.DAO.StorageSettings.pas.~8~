@@ -42,21 +42,19 @@ begin
   DM.VerificaCampos('CONFIGURACAO_ARMAZENAMENTO', 'Codigo', 'TEXT(25)');
   DM.VerificaCampos('CONFIGURACAO_ARMAZENAMENTO', 'Diretorio', 'TEXT(150)');
   DM.VerificaCampos('CONFIGURACAO_ARMAZENAMENTO', 'ID', 'INTEGER');
-  DM.VerificaCampos('CONFIGURACAO_ARMAZENAMENTO', 'Servidor', 'TEXT(20)');
-  DM.VerificaCampos('CONFIGURACAO_ARMAZENAMENTO', 'Usuario', 'TEXT(20)');
-  DM.VerificaCampos('CONFIGURACAO_ARMAZENAMENTO', 'Senha', 'TEXT(20)');
-  DM.VerificaCampos('CONFIGURACAO_ARMAZENAMENTO', 'Porta', 'INTEGER');
-  DM.VerificaCampos('CONFIGURACAO_ARMAZENAMENTO', 'TipoConfiguracao',
-    'TEXT(5)');
-  DM.VerificaCampos('CONFIGURACAO_ARMAZENAMENTO', 'SenhaArquivo', 'TEXT(25)');
+  DM.VerificaCampos('CONFIGURACAO_ARMAZENAMENTO', 'Caminho', 'TEXT(150)');
+  DM.VerificaCampos('CONFIGURACAO_ARMAZENAMENTO', 'UltimaModificacao', 'DATETIME');
+  DM.VerificaCampos('CONFIGURACAO_ARMAZENAMENTO', 'CodigoRotina', 'TEXT(25)');
+  DM.VerificaCampos('CONFIGURACAO_ARMAZENAMENTO', 'Tamanho', 'INT64');
 end;
 
 {%CLASSGROUP 'FMX.Controls.TControl'}
+
 {$R *.dfm}
 
 procedure TdmStorageSettings.DataModuleCreate(Sender: TObject);
 begin
-  VerificaCamposBanco;
+ VerificaCamposBanco;
 end;
 
 end.

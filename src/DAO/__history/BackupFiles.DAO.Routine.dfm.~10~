@@ -1,5 +1,4 @@
 object DMRoutine: TDMRoutine
-  OnCreate = DataModuleCreate
   Height = 480
   Width = 640
   object TabRotina: TFDQuery

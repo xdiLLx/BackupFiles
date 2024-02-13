@@ -37,11 +37,11 @@ begin
   DM.VerificaTabela('ITEMBACKUP');
   DM.VerificaCampos('ITEMBACKUP', 'Codigo', 'TEXT(25)');
   DM.VerificaCampos('ITEMBACKUP', 'Nome', 'TEXT(50)');
-  DM.VerificaCampos('ITEMBACKUP', 'ID', 'INT');
-  DM.VerificaCampos('ITEMBACKUP', 'Caminho', 'TEXT(150)');
-  DM.VerificaCampos('ITEMBACKUP', 'UltimaModificacao', 'DATETIME');
-  DM.VerificaCampos('ITEMBACKUP', 'CodigoRotina', 'TEXT(25)');
-  DM.VerificaCampos('ITEMBACKUP', 'Tamanho', 'INT64');
+  DM.VerificaCampos('ITEMBACKUP', 'ID', 'INTEGER');
+  DM.VerificaCampos('ITEMBACKUP', 'Caminho', 'TEXT(25)');
+  DM.VerificaCampos('ITEMBACKUP', 'UltimaModificacao', 'TEXT(50)');
+  DM.VerificaCampos('ITEMBACKUP', 'CodigoRotina', 'TEXT(50)');
+  DM.VerificaCampos('ITEMBACKUP', 'Tamanho', 'TEXT(50)');
 end;
 
 {%CLASSGROUP 'FMX.Controls.TControl'}

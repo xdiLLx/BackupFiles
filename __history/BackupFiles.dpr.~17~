@@ -23,8 +23,8 @@ begin
   Application.Initialize;
   ReportMemoryLeaksonshutdown := true;
   Application.CreateForm(TV, V);
-  Application.CreateForm(TDM, DM);
   Application.CreateForm(TDMRoutine, DMRoutine);
+  Application.CreateForm(TDM, DM);
   Application.CreateForm(TdmBackupItem, dmBackupItem);
   Application.CreateForm(TdmStorageSettings, dmStorageSettings);
   Application.Run;

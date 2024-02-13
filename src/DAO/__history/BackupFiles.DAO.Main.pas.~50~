@@ -61,8 +61,8 @@ begin
   if sqlAux.FindField(aNomeCampo) = nil then
   begin
     sqlAux.Close;
-    sqlAux.SQL.Text := 'ALTER TABLE ' + aNomeTabela + ' ADD COLUMN ' +
-      aNomeCampo + ' ' + aTipoCampo;
+    sqlAux.SQL.Text := 'ALTER TABLE ' + aNomeTabela + ' ADD COLUMN ' + aNomeCampo
+      + ' ' + aTipoCampo;
     sqlAux.ExecSQL;
   end;
 end;
@@ -79,11 +79,9 @@ procedure TDM.ConectarBanco;
 begin
   if not database.Connected then
   begin
-    if not DirectoryExists(ExtractFilePath(ParamStr(0)) + 'resources') then
-      ForceDirectories(ExtractFilePath(ParamStr(0)) + 'resources');
-
     database.Params.Add('OpenMode=CreateUTF8');
-    database.Params.database := ExtractFilePath(ParamStr(0)) + 'resources\BackupFiles.db';
+    database.Params.database := ExtractFilePath(ParamStr(0)) +
+      'BackupFiles.db';
     database.Connected := True;
   end;
 end;

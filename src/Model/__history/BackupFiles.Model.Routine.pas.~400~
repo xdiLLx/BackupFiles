@@ -295,7 +295,6 @@ begin
     FTP.Port := FSettings.Porta;
     FTP.Username := FSettings.Usuario;
     FTP.Password := FSettings.Senha;
-    FTP.ReadTimeout := 10000;
     FTP.Passive := true;
     FTP.Connect;
     try

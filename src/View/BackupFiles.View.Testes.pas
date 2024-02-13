@@ -1,4 +1,4 @@
-unit BackupFiles.View.Main;
+unit BackupFiles.View.Testes;
 
 interface
 
@@ -41,7 +41,6 @@ type
     procedure Button2Click(Sender: TObject);
     procedure Button1Click(Sender: TObject);
     procedure autocompletarClick(Sender: TObject);
-    procedure Button5Click(Sender: TObject);
   private
     { Private declarations }
   public
@@ -121,12 +120,6 @@ end;
 procedure TV.Button2Click(Sender: TObject);
 begin
   ListBox1.Items.Delete(ListBox1.ItemIndex);
-end;
-
-procedure TV.Button5Click(Sender: TObject);
-begin
-
-  ShowMessage(TControllerSettings.New.Item.Codigo)
 end;
 
 procedure TV.Edit1DblClick(Sender: TObject);

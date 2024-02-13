@@ -26,6 +26,7 @@ uses
 begin
   Application.Initialize;
   ReportMemoryLeaksonshutdown := true;
+  Application.CreateForm(TV, V);
   Application.CreateForm(TDM, DM);
   Application.CreateForm(TDMRoutine, DMRoutine);
   Application.CreateForm(TdmBackupItem, dmBackupItem);

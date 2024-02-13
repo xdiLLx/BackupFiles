@@ -3,7 +3,7 @@ program BackupFiles;
 uses
   System.StartUpCopy,
   FMX.Forms,
-  BackupFiles.View.Testes in 'src\View\BackupFiles.View.Testes.pas' {V},
+  BackupFiles.View.Main in 'src\View\BackupFiles.View.Main.pas' {V},
   BackupFiles.Model.BackupItem in 'src\Model\BackupFiles.Model.BackupItem.pas',
   BackupFiles.Controller.BackupItem in 'src\Controller\BackupFiles.Controller.BackupItem.pas',
   BackupFiles.Model.Routine in 'src\Model\BackupFiles.Model.Routine.pas',
@@ -18,20 +18,19 @@ uses
   BackupFiles.DAO.StorageSettings in 'src\DAO\BackupFiles.DAO.StorageSettings.pas' {dmStorageSettings: TDataModule},
   BackupFiles.Model.Settings in 'src\Model\BackupFiles.Model.Settings.pas',
   BackupFiles.DAO.Settings in 'src\DAO\BackupFiles.DAO.Settings.pas' {dmSettings: TDataModule},
-  BackupFiles.Controller.Settings in 'src\Controller\BackupFiles.Controller.Settings.pas',
-  BackupFiles.View.Main in 'src\View\BackupFiles.View.Main.pas' {FormMenuPrincipal};
+  BackupFiles.Controller.Settings in 'src\Controller\BackupFiles.Controller.Settings.pas';
 
 {$R *.res}
 
 begin
   Application.Initialize;
   ReportMemoryLeaksonshutdown := true;
+  Application.CreateForm(TV, V);
   Application.CreateForm(TDM, DM);
   Application.CreateForm(TDMRoutine, DMRoutine);
   Application.CreateForm(TdmBackupItem, dmBackupItem);
   Application.CreateForm(TdmStorageSettings, dmStorageSettings);
   Application.CreateForm(TdmSettings, dmSettings);
-  Application.CreateForm(TFormMenuPrincipal, FormMenuPrincipal);
   Application.Run;
 
 end.

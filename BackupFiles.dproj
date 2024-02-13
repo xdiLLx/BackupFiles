@@ -193,7 +193,7 @@
         <DelphiCompile Include="$(MainSource)">
             <MainSource>MainSource</MainSource>
         </DelphiCompile>
-        <DCCReference Include="src\View\BackupFiles.View.Main.pas">
+        <DCCReference Include="src\View\BackupFiles.View.Testes.pas">
             <Form>V</Form>
             <FormType>fmx</FormType>
         </DCCReference>
@@ -232,6 +232,10 @@
             <DesignClass>TDataModule</DesignClass>
         </DCCReference>
         <DCCReference Include="src\Controller\BackupFiles.Controller.Settings.pas"/>
+        <DCCReference Include="src\View\BackupFiles.View.Main.pas">
+            <Form>FormMenuPrincipal</Form>
+            <FormType>fmx</FormType>
+        </DCCReference>
         <BuildConfiguration Include="Base">
             <Key>Base</Key>
         </BuildConfiguration>

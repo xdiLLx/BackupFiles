@@ -101,7 +101,6 @@ type
     procedure btnListaDeArquivosClick(Sender: TObject);
     procedure cbModeloArmazenamentoChange(Sender: TObject);
     procedure btnAdicionarItemClick(Sender: TObject);
-    procedure btnRemoverItemClick(Sender: TObject);
   private
     procedure AplicaBordas(aValue: Integer);
     procedure FTPSelecionado(aValue: Boolean);
@@ -121,23 +120,9 @@ uses
 {$R *.fmx}
 
 procedure TFormMenuPrincipal.btnAdicionarItemClick(Sender: TObject);
-var
-  ItemIndex: Integer;
-  FileName: string;
 begin
   if OpenDialogAdicionarItem.Execute then
-  begin
-    FileName := OpenDialogAdicionarItem.FileName;
-    ItemIndex := lbItens.Items.IndexOf(FileName);
-
-    if ItemIndex = -1 then
-    begin
-      lbItens.Items.Add(FileName);
-      lbItens.ListItems[lbItens.Count-1].StyleLookup := 'ListBoxItem2Style1';
-    end
-    else
-      ShowMessage('Este arquivo já foi adicionado.');
-  end;
+    lbItens.Items.Add(OpenDialogAdicionarItem.FileName);
 end;
 
 procedure TFormMenuPrincipal.btnConfiguracaoProjetoClick(Sender: TObject);
@@ -152,11 +137,6 @@ begin
   lblCaminho.Text := 'Rotinas  /  ' + lblNomeProjeto.Text + '  /  ' +
     'Lista de Arquivos';
   TabControlRotinas.ActiveTab := TabItem4;
-end;
-
-procedure TFormMenuPrincipal.btnRemoverItemClick(Sender: TObject);
-begin
-  lbItens.Items.Delete(lbItens.ItemIndex);
 end;
 
 procedure TFormMenuPrincipal.FTPSelecionado(aValue: Boolean);

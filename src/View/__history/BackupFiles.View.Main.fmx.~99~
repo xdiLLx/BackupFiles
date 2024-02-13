@@ -1175,7 +1175,6 @@ object FormMenuPrincipal: TFormMenuPrincipal
                   YRadius = 3.000000000000000000
                   ParentShowHint = False
                   ShowHint = False
-                  OnClick = btnRemoverItemClick
                   ColorSettings.Color = xFF4F67AA
                   ColorSettings.StrokeColor = claBlack
                   ColorSettings.ActiveColor = xFF3D5085

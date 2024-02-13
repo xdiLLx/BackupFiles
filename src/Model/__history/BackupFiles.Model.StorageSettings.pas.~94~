@@ -40,13 +40,13 @@ type
     function TipoConfiguracao: TTipoConfigStorage; overload;
     function BuscarDados(aCodigo: string): iStorageSettings;
     function Salvar: iStorageSettings;
-    class function New: iStorageSettings; overload;
   public
     constructor Create(TipoConfiguracao: TTipoConfigStorage); overload;
     constructor Create; overload;
     destructor Destroy; override;
     class function New(TipoConfiguracao: TTipoConfigStorage)
       : iStorageSettings; overload;
+    class function New: iStorageSettings; overload;
   end;
 
 implementation
@@ -101,6 +101,8 @@ begin
     .AsInteger := FPorta;
   dmStorageSettings.TabConfiguracaoArmazenamentoFiltrada.FieldByName('Codigo')
     .AsString := FCodigo;
+  dmStorageSettings.TabConfiguracaoArmazenamento.FieldByName('SenhaArquivo')
+    .AsString := FSenhaDeArquivo;
   if FTipoConfiguracao = FTP then
     dmStorageSettings.TabConfiguracaoArmazenamentoFiltrada.FieldByName
       ('TipoConfiguracao').AsString := 'FTP'
@@ -128,6 +130,8 @@ begin
     := FPorta;
   dmStorageSettings.TabConfiguracaoArmazenamento.FieldByName('Codigo').AsString
     := FCodigo;
+  dmStorageSettings.TabConfiguracaoArmazenamento.FieldByName('SenhaArquivo')
+    .AsString := FSenhaDeArquivo;
   if FTipoConfiguracao = FTP then
     dmStorageSettings.TabConfiguracaoArmazenamento.FieldByName
       ('TipoConfiguracao').AsString := 'FTP'
@@ -165,6 +169,8 @@ begin
     ('Porta').AsInteger;
   FCodigo := dmStorageSettings.TabConfiguracaoArmazenamentoFiltrada.FieldByName
     ('Codigo').AsString;
+  FSenhaDeArquivo := dmStorageSettings.TabConfiguracaoArmazenamentoFiltrada.FieldByName
+    ('SenhaArquivo').AsString;
 
   if dmStorageSettings.TabConfiguracaoArmazenamentoFiltrada.FieldByName
     ('TipoConfiguracao').AsString = 'FTP' then
@@ -190,6 +196,7 @@ constructor TStorageSettings.Create(TipoConfiguracao: TTipoConfigStorage);
 begin
   FCodigo := GenerateUniqueCode;
   FSenhaDeArquivo := '';
+  FTipoConfiguracao := TipoConfiguracao;
 end;
 
 destructor TStorageSettings.Destroy;

@@ -209,7 +209,7 @@ function TStorageSettings.Diretorio(Value: string): iStorageSettings;
 begin
   if Value = '' then
     raise Exception.Create('O Caminho do diretório não pode estar em branco');
-  if not DirectoryExists(Value) then
+  if (not DirectoryExists(Value)) and (FTipoConfiguracao = Local) then
     raise Exception.Create('O diretório informado não existe');
   FDiretorio := Value;
   Result := Self;

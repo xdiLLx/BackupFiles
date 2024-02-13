@@ -105,6 +105,7 @@ object V: TV
   object Edit4: TEdit
     Touch.InteractiveGestures = [LongTap, DoubleTap]
     TabOrder = 3
+    Password = True
     Position.X = 280.000000000000000000
     Position.Y = 198.000000000000000000
     Size.Width = 120.000000000000000000

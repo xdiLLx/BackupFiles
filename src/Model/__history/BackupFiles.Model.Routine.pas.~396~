@@ -16,7 +16,9 @@ uses
   System.IOUtils,
   System.Classes,
   System.SysUtils,
-  System.DateUtils;
+  System.DateUtils,
+  IdFTP,
+  IdFTPList;
 
 type
   TRoutine = class(TInterfacedObject, iRoutine)
@@ -27,12 +29,22 @@ type
     procedure BuscaItensRotina;
     procedure SalvarItens;
     procedure IniciarBackupLocal;
+    function CriarBackupTemporario: string;
     procedure IniciarBackupFTP;
-    function VerificarUltimosBackups: Boolean;
-    function VerificarNomeArquivo: string;
+    function VerificarUltimosBackups: Boolean; overload;
+    function VerificarUltimosBackups(FTP: TIdFTP; const BaseDir: string;
+      TotalBackups: Integer): Boolean; overload;
+    function VerificarNomeArquivo: string; overload;
+    function VerificarNomeArquivo(FTP: TIdFTP; const BaseDir: string)
+      : string; overload;
     function LocalizaCodigoEmZip(const Value: string): Boolean;
-    function EncontrarBackupsValidos: TStringList;
-    function ExcluirArquivoMaisAntigo(ListaArquivos: TStringList): Boolean;
+    function EncontrarBackupsValidos: TStringList; overload;
+    function EncontrarBackupsValidos(FTP: TIdFTP; const BaseDir: string)
+      : TStringList; overload;
+    function ExcluirArquivoMaisAntigo(ListaArquivos: TStringList)
+      : Boolean; overload;
+    function ExcluirArquivoMaisAntigo(FTP: TIdFTP; ListaDetalhes: TStringList;
+      const BaseDir: string): Boolean; overload;
   private
     { Campos privados }
     FCodigo: string;
@@ -196,6 +208,37 @@ begin
   FItemLista := TList<iBackupItem>.Create;
 end;
 
+function TRoutine.CriarBackupTemporario: string;
+var
+  lZipper: TAbZipper;
+  ArquivoTemporario: string;
+begin
+  Result := '';
+  lZipper := TAbZipper.Create(nil);
+  try
+    lZipper.StoreOptions := [soStripDrive, soStripPath];
+    lZipper.FileName := FDescricao + ' - ' + FCodigo + ' - ' +
+      FormatDateTime('dd-mm-yy', Now) + '.zip';
+    lZipper.OpenArchive(TPath.GetTempPath + lZipper.FileName);
+    if FSettings.SenhaDeArquivo <> '' then
+      lZipper.Password := FSettings.SenhaDeArquivo;
+    ArquivoTemporario := TPath.GetTempPath;
+    for var Item in FItemLista do
+    begin
+      ArquivoTemporario := ArquivoTemporario + ExtractFileName(Item.Caminho);
+      TFile.Copy(Item.Caminho, ArquivoTemporario, true);
+      lZipper.AddFiles((ArquivoTemporario), 0);
+      lZipper.Save;
+      TFile.Delete((ArquivoTemporario));
+    end;
+    lZipper.Save;
+    Result := lZipper.FileName;
+    lZipper.CloseArchive;
+  finally
+    lZipper.Free;
+  end;
+end;
+
 function TRoutine.Descricao(Value: string): iRoutine;
 begin
   if Value = '' then
@@ -235,7 +278,37 @@ begin
 end;
 
 procedure TRoutine.IniciarBackupFTP;
+var
+  FTP: TIdFTP;
+  lCaminhoBackupTemporario, lNomeArquivoFTP: string;
+  lBaseDir: string;
 begin
+  lBaseDir := FSettings.Diretorio;
+  lCaminhoBackupTemporario := CriarBackupTemporario;
+
+  // Cria e configura o objeto FTP
+  FTP := TIdFTP.Create(nil);
+  try
+    FTP.Host := FSettings.Servidor;
+    FTP.Port := FSettings.Porta;
+    FTP.Username := FSettings.Usuario;
+    FTP.Password := FSettings.Senha;
+    FTP.Passive := true;
+    FTP.Connect;
+    try
+      FTP.ChangeDir(lBaseDir);
+      VerificarUltimosBackups(FTP, lBaseDir, FTotalBackups);
+      lNomeArquivoFTP := VerificarNomeArquivo(FTP, lBaseDir);
+      FTP.Passive := False;
+      FTP.Put(lCaminhoBackupTemporario, lNomeArquivoFTP);
+
+    finally
+      FTP.Disconnect;
+    end;
+  finally
+    FTP.Free;
+  end;
+  DeleteFile(lCaminhoBackupTemporario);
 
 end;
 
@@ -248,12 +321,12 @@ begin
   lZipper := TAbZipper.Create(nil);
   try
     VerificarUltimosBackups;
-
-    lZipper.FileName := VerificarNomeArquivo;
     lZipper.StoreOptions := [soStripDrive, soStripPath];
+    lZipper.FileName := VerificarNomeArquivo;
     lZipper.OpenArchive(FSettings.Diretorio + lZipper.FileName);
     if FSettings.SenhaDeArquivo <> '' then
       lZipper.Password := FSettings.SenhaDeArquivo;
+
     ArquivoTemporario := TPath.GetTempPath;
     for var Item in FItemLista do
     begin
@@ -395,11 +468,103 @@ begin
   end;
 end;
 
+function TRoutine.EncontrarBackupsValidos(FTP: TIdFTP; const BaseDir: string)
+  : TStringList;
+var
+  I: Integer;
+begin
+  Result := TStringList.Create;
+  try
+    FTP.List(BaseDir, False);
+    // Preenche FTP.DirectoryListing com os detalhes dos arquivos
+    for I := 0 to FTP.DirectoryListing.Count - 1 do
+    begin
+      with FTP.DirectoryListing[I] do
+      begin
+        // Verifique se o item é um arquivo
+        if (ItemType = ditFile) and LocalizaCodigoEmZip(FileName) then
+        begin
+          Result.Add(FileName + ';' + DateTimeToStr(FTP.DirectoryListing[I].ModifiedDate));
+        end;
+      end;
+    end;
+  except
+    on E: Exception do
+    begin
+      // Tratar exceção conforme necessário
+      Result.Free;
+      raise;
+    end;
+  end;
+end;
+
+function TRoutine.ExcluirArquivoMaisAntigo(FTP: TIdFTP;
+  ListaDetalhes: TStringList; const BaseDir: string): Boolean;
+var
+  I: Integer;
+  ArquivoMaisAntigo: string;
+  DataHoraMaisAntiga, DataHoraArquivo: TDateTime;
+  NomeArquivo, StrDataHoraArquivo: string;
+  ParsedLine: TStringList;
+begin
+  Result := False;
+  if ListaDetalhes.Count = 0 then
+    Exit; // Nada a fazer se a lista estiver vazia
+
+  DataHoraMaisAntiga := Now;
+
+  ParsedLine := TStringList.Create;
+  try
+    ParsedLine.Delimiter := ';'; // Supondo que o delimitador seja ';'
+    ParsedLine.StrictDelimiter := true;
+    // Não considera espaços como delimitadores
+
+    for I := 0 to ListaDetalhes.Count - 1 do
+    begin
+      ParsedLine.DelimitedText := ListaDetalhes[I];
+      if ParsedLine.Count >= 2 then
+      // Verifica se a linha tem pelo menos dois elementos
+      begin
+        NomeArquivo := ParsedLine[0];
+        StrDataHoraArquivo := ParsedLine[1];
+
+        // Conversão da string de data/hora para TDateTime
+        if TryStrToDateTime(StrDataHoraArquivo, DataHoraArquivo) then
+        begin
+          // Se a data do arquivo for mais antiga que a que temos, atualize o registro
+          if DataHoraArquivo < DataHoraMaisAntiga then
+          begin
+            DataHoraMaisAntiga := DataHoraArquivo;
+            ArquivoMaisAntigo := NomeArquivo;
+          end;
+        end;
+      end;
+    end;
+
+    // Se encontramos um arquivo mais antigo, vamos excluí-lo
+    if ArquivoMaisAntigo <> '' then
+    begin
+      try
+        FTP.Delete(ArquivoMaisAntigo);
+        Result := true;
+      except
+        on E: Exception do
+        begin
+          // Tratar a exceção conforme necessário
+          Result := False;
+        end;
+      end;
+    end;
+  finally
+    ParsedLine.Free;
+  end;
+end;
+
 function TRoutine.ExcluirArquivoMaisAntigo(ListaArquivos: TStringList): Boolean;
 var
   ArquivoMaisAntigo: string;
   IdadeArquivoMaisAntigo, IdadeArquivoAtual: Integer;
-  i: Integer;
+  I: Integer;
 begin
   Result := False;
   if ListaArquivos.Count = 0 then
@@ -408,17 +573,66 @@ begin
   ArquivoMaisAntigo := ListaArquivos[0];
   IdadeArquivoMaisAntigo := FileAge(ArquivoMaisAntigo);
 
-  for i := 1 to ListaArquivos.Count - 1 do
+  for I := 1 to ListaArquivos.Count - 1 do
   begin
-    IdadeArquivoAtual := FileAge(ListaArquivos[i]);
+    IdadeArquivoAtual := FileAge(ListaArquivos[I]);
     if IdadeArquivoAtual < IdadeArquivoMaisAntigo then
     begin
-      ArquivoMaisAntigo := ListaArquivos[i];
+      ArquivoMaisAntigo := ListaArquivos[I];
       IdadeArquivoMaisAntigo := IdadeArquivoAtual;
     end;
   end;
 
   Result := DeleteFile(ArquivoMaisAntigo);
+end;
+
+function TRoutine.VerificarNomeArquivo(FTP: TIdFTP;
+  const BaseDir: string): string;
+var
+  Contador: Integer;
+  NovoNome, NomeArquivoRemoto: string;
+  ListaArquivos: TStringList;
+begin
+  Contador := 0;
+  ListaArquivos := TStringList.Create;
+  try
+    FTP.List(ListaArquivos, BaseDir, False);
+
+    repeat
+      if Contador = 0 then
+        NovoNome := FDescricao + ' - ' + FCodigo + ' - ' +
+          FormatDateTime('dd-mm-yy', Now)
+      else
+        NovoNome := Format('%s - (%d)', [NovoNome, Contador]);
+
+      NomeArquivoRemoto := BaseDir + NovoNome;
+      if ListaArquivos.IndexOf(BaseDir+'/' + NovoNome+ '.zip') > -1 then
+        Inc(Contador)
+      else
+        Break;
+
+    until False;
+  finally
+    ListaArquivos.Free;
+  end;
+  Result := NovoNome + '.zip';
+end;
+
+function TRoutine.VerificarUltimosBackups(FTP: TIdFTP; const BaseDir: string;
+  TotalBackups: Integer): Boolean;
+var
+  ListaBackupsValidos: TStringList;
+begin
+  ListaBackupsValidos := EncontrarBackupsValidos(FTP, BaseDir);
+  try
+    Result := ListaBackupsValidos.Count >= TotalBackups;
+    if Result then
+    begin
+      ExcluirArquivoMaisAntigo(FTP, ListaBackupsValidos, BaseDir);
+    end;
+  finally
+    ListaBackupsValidos.Free;
+  end;
 end;
 
 function TRoutine.VerificarUltimosBackups: Boolean;

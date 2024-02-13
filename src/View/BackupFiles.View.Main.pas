@@ -73,9 +73,9 @@ begin
   NumberBox1.Value := 1;
   ComboBox1.ItemIndex := 1;
   Edit1.Text := 'C:\Users\GabrielDill\Downloads\Teste de Backup\';
-  Edit2.Text := 'gabrieldill.com';
-  Edit3.Text := 'root';
-  Edit4.Text := '4321';
+  Edit2.Text := '192.168.0.100';
+  Edit3.Text := 'GabrielDill';
+  Edit4.Text := '981316227x';
   Edit5.Text := '21';
   Edit7.Text := '1234';
 end;
@@ -123,7 +123,7 @@ end;
 
 procedure TV.Button4Click(Sender: TObject);
 begin
-  TControllerRoutine.New.Item.BuscarDados('A0C5AE1B2A6F4C6C927713767')
+  TControllerRoutine.New.Item.BuscarDados('E802979523DF41768B7788965')
     .IniciarBackup;
 end;
 

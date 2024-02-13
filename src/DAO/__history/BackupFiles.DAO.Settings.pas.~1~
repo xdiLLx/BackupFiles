@@ -1,0 +1,25 @@
+unit BackupFiles.DAO.Settings;
+
+interface
+
+uses
+  System.SysUtils, System.Classes;
+
+type
+  TdmSettings = class(TDataModule)
+  private
+    { Private declarations }
+  public
+    { Public declarations }
+  end;
+
+var
+  dmSettings: TdmSettings;
+
+implementation
+
+{%CLASSGROUP 'FMX.Controls.TControl'}
+
+{$R *.dfm}
+
+end.

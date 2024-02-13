@@ -1,0 +1,42 @@
+unit BackupFiles.Controller.Settings;
+
+interface
+
+uses
+  BackupFiles.Controller.Interfaces,
+  BackupFiles.Model.Interfaces;
+
+type
+TControllerSettings = class(TInterfacedObject, iControllerSettings)
+private
+    { Campos privados }
+public
+    constructor Create;
+    destructor Destroy; override;
+    class function New: iControllerSettings;
+    function Item: iSettings;
+end;
+
+implementation
+
+{ TControllerSettings }
+
+uses BackupFiles.Model.Settings;
+
+constructor TControllerSettings.Create;
+begin
+
+end;
+
+destructor TControllerSettings.Destroy;
+begin
+
+    inherited;
+end;
+
+class function TControllerSettings.New: iControllerSettings;
+begin
+    Result := Self.Create;
+end;
+
+end.

@@ -225,6 +225,13 @@
             <FormType>dfm</FormType>
             <DesignClass>TDataModule</DesignClass>
         </DCCReference>
+        <DCCReference Include="src\Model\BackupFiles.Model.Settings.pas"/>
+        <DCCReference Include="src\DAO\BackupFiles.DAO.Settings.pas">
+            <Form>dmSettings</Form>
+            <FormType>dfm</FormType>
+            <DesignClass>TDataModule</DesignClass>
+        </DCCReference>
+        <DCCReference Include="src\Controller\BackupFiles.Controller.Settings.pas"/>
         <BuildConfiguration Include="Base">
             <Key>Base</Key>
         </BuildConfiguration>

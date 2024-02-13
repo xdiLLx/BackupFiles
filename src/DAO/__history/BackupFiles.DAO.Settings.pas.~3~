@@ -1,0 +1,44 @@
+unit BackupFiles.DAO.Settings;
+
+interface
+
+uses
+  System.SysUtils, System.Classes, FireDAC.Stan.Intf, FireDAC.Stan.Option,
+  FireDAC.Stan.Param, FireDAC.Stan.Error, FireDAC.DatS, FireDAC.Phys.Intf,
+  FireDAC.DApt.Intf, FireDAC.Stan.Async, FireDAC.DApt, Data.DB,
+  FireDAC.Comp.DataSet, FireDAC.Comp.Client;
+
+type
+  TdmSettings = class(TDataModule)
+    TabConfiguracao: TFDQuery;
+  private
+    { Private declarations }
+    procedure VerificaCamposBanco;
+  public
+    { Public declarations }
+  end;
+
+var
+  dmSettings: TdmSettings;
+
+implementation
+
+{%CLASSGROUP 'FMX.Controls.TControl'}
+
+uses BackupFiles.DAO.Main;
+
+procedure TdmSettings.VerificaCamposBanco;
+begin
+  DM.VerificaTabela('ITEMBACKUP');
+  DM.VerificaCampos('ITEMBACKUP', 'Codigo', 'TEXT(25)');
+  DM.VerificaCampos('ITEMBACKUP', 'Nome', 'TEXT(50)');
+  DM.VerificaCampos('ITEMBACKUP', 'ID', 'INT');
+  DM.VerificaCampos('ITEMBACKUP', 'Caminho', 'TEXT(150)');
+  DM.VerificaCampos('ITEMBACKUP', 'UltimaModificacao', 'DATETIME');
+  DM.VerificaCampos('ITEMBACKUP', 'CodigoRotina', 'TEXT(25)');
+  DM.VerificaCampos('ITEMBACKUP', 'Tamanho', 'INT64');
+end;
+
+{$R *.dfm}
+
+end.

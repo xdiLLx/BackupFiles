@@ -35,12 +35,12 @@ type
     Edit7: TEdit;
     autocompletar: TButton;
     Button4: TButton;
+    Button5: TButton;
     procedure Edit1DblClick(Sender: TObject);
     procedure AdicionarItemClick(Sender: TObject);
     procedure Button2Click(Sender: TObject);
     procedure Button1Click(Sender: TObject);
     procedure autocompletarClick(Sender: TObject);
-    procedure Button4Click(Sender: TObject);
   private
     { Private declarations }
   public
@@ -56,7 +56,8 @@ implementation
 
 {$R *.fmx}
 
-uses BackupFiles.Controller.Routine, BackupFiles.Controller.StorageSettings;
+uses BackupFiles.Controller.Routine, BackupFiles.Controller.StorageSettings,
+  BackupFiles.Controller.Settings;
 
 procedure TV.AdicionarItemClick(Sender: TObject);
 begin
@@ -119,12 +120,6 @@ end;
 procedure TV.Button2Click(Sender: TObject);
 begin
   ListBox1.Items.Delete(ListBox1.ItemIndex);
-end;
-
-procedure TV.Button4Click(Sender: TObject);
-begin
-  TControllerRoutine.New.Item.BuscarDados('E802979523DF41768B7788965')
-    .IniciarBackup;
 end;
 
 procedure TV.Edit1DblClick(Sender: TObject);

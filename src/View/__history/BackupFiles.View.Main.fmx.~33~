@@ -10,7 +10,7 @@ object V: TV
   DesignerMasterStyle = 0
   object edtcaminho: TEdit
     Touch.InteractiveGestures = [LongTap, DoubleTap]
-    TabOrder = 5
+    TabOrder = 6
     Position.X = 24.000000000000000000
     Position.Y = 69.000000000000000000
     Size.Width = 288.000000000000000000
@@ -24,8 +24,9 @@ object V: TV
     Size.Width = 120.000000000000000000
     Size.Height = 22.000000000000000000
     Size.PlatformDefault = False
-    TabOrder = 6
+    TabOrder = 7
     Text = 'Criar Rotina'
+    OnClick = Button1Click
   end
   object TimeEdit1: TTimeEdit
     Time = 0.773981840277777800
@@ -34,11 +35,11 @@ object V: TV
     Size.Width = 100.000000000000000000
     Size.Height = 25.000000000000000000
     Size.PlatformDefault = False
-    TabOrder = 8
+    TabOrder = 9
   end
   object NumberBox1: TNumberBox
     Touch.InteractiveGestures = [LongTap, DoubleTap]
-    TabOrder = 9
+    TabOrder = 10
     Cursor = crIBeam
     Position.X = 440.000000000000000000
     Position.Y = 69.000000000000000000
@@ -47,7 +48,7 @@ object V: TV
     Position.X = 24.000000000000000000
     Position.Y = 44.000000000000000000
     Text = 'Rotina'
-    TabOrder = 11
+    TabOrder = 12
   end
   object B: TLabel
     Position.X = 24.000000000000000000
@@ -56,25 +57,26 @@ object V: TV
     Size.Height = 17.000000000000000000
     Size.PlatformDefault = False
     Text = 'Configura'#231#245'es de Armazenamento'
-    TabOrder = 10
+    TabOrder = 11
   end
   object ComboBox1: TComboBox
     Items.Strings = (
       'Local'
       'FTP')
+    ItemIndex = 0
     Position.X = 24.000000000000000000
     Position.Y = 135.000000000000000000
     Size.Width = 185.000000000000000000
     Size.Height = 22.000000000000000000
     Size.PlatformDefault = False
-    TabOrder = 12
+    TabOrder = 13
   end
   object Edit1: TEdit
     Touch.InteractiveGestures = [LongTap, DoubleTap]
     TabOrder = 0
     Position.X = 24.000000000000000000
     Position.Y = 165.000000000000000000
-    Size.Width = 636.000000000000000000
+    Size.Width = 529.000000000000000000
     Size.Height = 25.000000000000000000
     Size.PlatformDefault = False
     TextPrompt = 'Diretorio de Save'
@@ -82,7 +84,7 @@ object V: TV
   end
   object Edit2: TEdit
     Touch.InteractiveGestures = [LongTap, DoubleTap]
-    TabOrder = 4
+    TabOrder = 5
     Position.X = 24.000000000000000000
     Position.Y = 198.000000000000000000
     Size.Width = 120.000000000000000000
@@ -92,7 +94,7 @@ object V: TV
   end
   object Edit3: TEdit
     Touch.InteractiveGestures = [LongTap, DoubleTap]
-    TabOrder = 3
+    TabOrder = 4
     Position.X = 152.000000000000000000
     Position.Y = 198.000000000000000000
     Size.Width = 120.000000000000000000
@@ -102,7 +104,8 @@ object V: TV
   end
   object Edit4: TEdit
     Touch.InteractiveGestures = [LongTap, DoubleTap]
-    TabOrder = 2
+    TabOrder = 3
+    Password = True
     Position.X = 280.000000000000000000
     Position.Y = 198.000000000000000000
     Size.Width = 120.000000000000000000
@@ -112,7 +115,7 @@ object V: TV
   end
   object Edit5: TEdit
     Touch.InteractiveGestures = [LongTap, DoubleTap]
-    TabOrder = 1
+    TabOrder = 2
     Position.X = 408.000000000000000000
     Position.Y = 198.000000000000000000
     Size.Width = 120.000000000000000000
@@ -126,7 +129,7 @@ object V: TV
     Size.Width = 97.000000000000000000
     Size.Height = 22.000000000000000000
     Size.PlatformDefault = False
-    TabOrder = 15
+    TabOrder = 16
     Text = 'Adicionar Item'
     OnClick = AdicionarItemClick
   end
@@ -136,22 +139,9 @@ object V: TV
     Size.Width = 97.000000000000000000
     Size.Height = 22.000000000000000000
     Size.PlatformDefault = False
-    TabOrder = 14
+    TabOrder = 15
     Text = 'Remover Item'
     OnClick = Button2Click
-  end
-  object Memo1: TMemo
-    Touch.InteractiveGestures = [Pan, LongTap, DoubleTap]
-    AutoSelect = True
-    DataDetectorTypes = []
-    Position.X = 24.000000000000000000
-    Position.Y = 278.000000000000000000
-    Size.Width = 636.000000000000000000
-    Size.Height = 107.000000000000000000
-    Size.PlatformDefault = False
-    TabOrder = 16
-    Viewport.Width = 632.000000000000000000
-    Viewport.Height = 103.000000000000000000
   end
   object Edit6: TEdit
     Touch.InteractiveGestures = [LongTap, DoubleTap]
@@ -172,6 +162,37 @@ object V: TV
     TabOrder = 18
     Text = 'Buscar Dados'
   end
+  object ListBox1: TListBox
+    Position.X = 26.000000000000000000
+    Position.Y = 270.000000000000000000
+    Size.Width = 634.000000000000000000
+    Size.Height = 171.000000000000000000
+    Size.PlatformDefault = False
+    TabOrder = 20
+    DisableFocusEffect = True
+    DefaultItemStyles.ItemStyle = ''
+    DefaultItemStyles.GroupHeaderStyle = ''
+    DefaultItemStyles.GroupFooterStyle = ''
+    Viewport.Width = 630.000000000000000000
+    Viewport.Height = 167.000000000000000000
+  end
+  object Edit7: TEdit
+    Touch.InteractiveGestures = [LongTap, DoubleTap]
+    TabOrder = 1
+    Position.X = 561.000000000000000000
+    Position.Y = 165.000000000000000000
+    Size.Width = 120.000000000000000000
+    Size.Height = 25.000000000000000000
+    Size.PlatformDefault = False
+    TextPrompt = 'Senha de Arquivo'
+  end
+  object autocompletar: TButton
+    Position.X = 617.000000000000000000
+    Position.Y = 8.000000000000000000
+    TabOrder = 21
+    Text = 'autocompletar'
+    OnClick = autocompletarClick
+  end
   object OpenDialog1: TOpenDialog
     Left = 496
     Top = 16
@@ -179,5 +200,23 @@ object V: TV
   object OpenDialog2: TOpenDialog
     Left = 568
     Top = 216
+  end
+  object Button4: TButton
+    Position.X = 345.000000000000000000
+    Position.Y = 449.000000000000000000
+    Size.Width = 160.000000000000000000
+    Size.Height = 22.000000000000000000
+    Size.PlatformDefault = False
+    TabOrder = 26
+    Text = 'IniciarBackup'
+  end
+  object Button5: TButton
+    Position.X = 345.000000000000000000
+    Position.Y = 479.000000000000000000
+    Size.Width = 160.000000000000000000
+    Size.Height = 22.000000000000000000
+    Size.PlatformDefault = False
+    TabOrder = 25
+    Text = 'TestarConfig'
   end
 end

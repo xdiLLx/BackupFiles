@@ -17,11 +17,12 @@ type
     function CodigoRotina: string; overload;
     function Codigo: string;
     function CodigoInterno: integer;
-    function BuscarDados(aCodigo: string): iBackupItem;
+    function BuscarDados(CodigoItem: string): iBackupItem;
     function Salvar: iBackupItem;
   end;
 
-  TTipoConfigStorage = (FTP,Local);
+  TTipoConfigStorage = (FTP, Local);
+
   iStorageSettings = interface
     ['{3478CAE7-BBDB-402C-BEDC-DF8A0B1DDAD8}']
     function Diretorio(Value: string): iStorageSettings; overload;
@@ -34,8 +35,11 @@ type
     function Senha: string; overload;
     function Porta(Value: integer): iStorageSettings; overload;
     function Porta: integer; overload;
-    function TipoConfiguracao(Value: TTipoConfigStorage): iStorageSettings; overload;
+    function TipoConfiguracao(Value: TTipoConfigStorage)
+      : iStorageSettings; overload;
     function TipoConfiguracao: TTipoConfigStorage; overload;
+    function SenhaDeArquivo(Value: string): iStorageSettings; overload;
+    function SenhaDeArquivo: string; overload;
     function BuscarDados(aCodigo: string): iStorageSettings;
     function Salvar: iStorageSettings;
     function Codigo: string;
@@ -56,9 +60,15 @@ type
     function Descricao: string; overload;
     function Descricao(Value: string): iRoutine; overload;
     function BuscarDados(aCodigo: string): iRoutine;
+    function IniciarBackup: iRoutine;
     function Salvar: iRoutine;
   end;
 
+  iSettings = interface
+    ['{6AD041D7-47C2-460C-A1BB-E5ECECE58F76}']
+    function IniciarComWindows(Value: Boolean): iSettings; overload;
+    function IniciarComWindows: Boolean; overload;
+  end;
 
 implementation
 

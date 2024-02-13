@@ -31,12 +31,12 @@ type
     procedure DataModuleCreate(Sender: TObject);
   private
     procedure ConectarBanco;
-    procedure VerificaTabela(aNomeTabela: string);
-    procedure VerificaCampos(aNomeTabela: string;
-      aNomeCampo, aTipoCampo: string);
     { Private declarations }
   public
     { Public declarations }
+    procedure VerificaTabela(aNomeTabela: string);
+    procedure VerificaCampos(aNomeTabela: string;
+      aNomeCampo, aTipoCampo: string);
   end;
 
 var
@@ -61,8 +61,8 @@ begin
   if sqlAux.FindField(aNomeCampo) = nil then
   begin
     sqlAux.Close;
-    sqlAux.SQL.Text := 'ALTER TABLE ' + aNomeTabela + 'ADD COLUMN ' + aNomeCampo
-      + ' ' + aTipoCampo;
+    sqlAux.SQL.Text := 'ALTER TABLE ' + aNomeTabela + ' ADD COLUMN ' +
+      aNomeCampo + ' ' + aTipoCampo;
     sqlAux.ExecSQL;
   end;
 end;
@@ -71,7 +71,7 @@ procedure TDM.VerificaTabela(aNomeTabela: string);
 begin
   sqlAux.Close;
   sqlAux.SQL.Text := 'CREATE TABLE IF NOT EXISTS ' + aNomeTabela +
-    '(Codigo TEXT(25))';
+    '(Codigo TEXT(25) PRIMARY KEY) ';
   sqlAux.ExecSQL;
 end;
 
@@ -79,8 +79,11 @@ procedure TDM.ConectarBanco;
 begin
   if not database.Connected then
   begin
-    database.Params.database := ExtractFilePath(ParamStr(0)) +
-      'resources\BackupFiles.db';
+    if not DirectoryExists(ExtractFilePath(ParamStr(0)) + 'resources') then
+      ForceDirectories(ExtractFilePath(ParamStr(0)) + 'resources');
+
+    database.Params.Add('OpenMode=CreateUTF8');
+    database.Params.database := ExtractFilePath(ParamStr(0)) + 'resources\BackupFiles.db';
     database.Connected := True;
   end;
 end;

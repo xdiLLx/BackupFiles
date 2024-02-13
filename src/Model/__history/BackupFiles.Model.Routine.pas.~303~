@@ -12,7 +12,11 @@ uses
   AbZipper,
   AbArcTyp,
   AbUtils,
-  AbZipKit, System.IOUtils, System.Classes;
+  AbZipKit,
+  System.IOUtils,
+  System.Classes,
+  System.SysUtils,
+  System.DateUtils;
 
 type
   TRoutine = class(TInterfacedObject, iRoutine)
@@ -24,7 +28,11 @@ type
     procedure SalvarItens;
     procedure IniciarBackupLocal;
     procedure IniciarBackupFTP;
-    procedure VerificarUltimosBackups;
+    function VerificarUltimosBackups: Boolean;
+    function VerificarNomeArquivo: string;
+    function LocalizaCodigoEmZip(const Value: string): Boolean;
+    function EncontrarBackupsValidos: TStringList;
+    function ExcluirArquivoMaisAntigo(ListaArquivos: TStringList): Boolean;
   private
     { Campos privados }
     FCodigo: string;
@@ -55,9 +63,6 @@ type
   end;
 
 implementation
-
-uses
-  System.SysUtils, System.DateUtils;
 
 function TRoutine.GenerateUniqueCode: string;
 var
@@ -161,7 +166,7 @@ begin
   FTotalBackups := DMRoutine.TabRotinaFiltrada.FieldByName('Total_Backup')
     .AsInteger;
   lCodigoConfig := DMRoutine.TabRotinaFiltrada.FieldByName
-    ('CodigoRotina').AsString;
+    ('CodigoConfiguracao').AsString;
   FCodigo := DMRoutine.TabRotinaFiltrada.FieldByName('Codigo').AsString;
   FSettings := TControllerStorageSettings.New.BuscarConfiguracao(lCodigoConfig);
   BuscaItensRotina;
@@ -243,40 +248,26 @@ begin
   lZipper := TAbZipper.Create(nil);
   try
     VerificarUltimosBackups;
-    // Defina o arquivo de destino para o arquivo ZIP
-    lZipper.FileName := FDescricao + ' - ' + FormatDateTime('dd-mm-yy',
-      Now) + '.zip';
-    lZipper.BaseDirectory := FSettings.Diretorio;
-    lZipper.Version := FCodigo;
 
-    // Abra o arquivo ZIP
-    lZipper.OpenArchive(FSettings.Diretorio + lZipper.FileName);
-    // Defina a senha para o arquivo ZIP
-     if FSettings.SenhaDeArquivo <> '' then
-      lZipper.Password := FSettings.SenhaDeArquivo;
+    lZipper.FileName := VerificarNomeArquivo;
     lZipper.StoreOptions := [soStripDrive, soStripPath];
+    lZipper.OpenArchive(FSettings.Diretorio + lZipper.FileName);
+    if FSettings.SenhaDeArquivo <> '' then
+      lZipper.Password := FSettings.SenhaDeArquivo;
+    lZipper.AutoSave:=true;;
     ArquivoTemporario := TPath.GetTempPath;
-    // Adicione os arquivos à lista do ZIP
     for var Item in FItemLista do
     begin
-     // ArquivoTemporario := ArquivoTemporario + ExtractFileName(Item.Caminho);
-      // Copia o arquivo para a pasta temporária
-     // TFile.Copy(Item.Caminho, ArquivoTemporario, True);
-
-      // Adiciona o arquivo temporário ao ZIP
-      lZipper.AddFiles((Item.Caminho),
-        0);
-      //lZipper.Save;
-      // Deleta o arquivo temporário após adicionar ao ZIP
-     // TFile.Delete((ArquivoTemporario));
+      ArquivoTemporario := ArquivoTemporario + ExtractFileName(Item.Caminho);
+      TFile.Copy(Item.Caminho, ArquivoTemporario, True);
+      lZipper.AddFiles((ArquivoTemporario), 0);
+      lZipper.Save;
+      TFile.Delete((ArquivoTemporario));
     end;
 
     lZipper.Save;
-    // Salve e feche o arquivo ZIP
-
     lZipper.CloseArchive;
   finally
-
     lZipper.Free;
   end;
 end;
@@ -299,6 +290,11 @@ end;
 function TRoutine.ListarItens: TList<iBackupItem>;
 begin
   Result := FItemLista;
+end;
+
+function TRoutine.LocalizaCodigoEmZip(const Value: string): Boolean;
+begin
+  Result := Pos(FCodigo, Value) > 0;
 end;
 
 function TRoutine.Horario(Value: TDateTime): iRoutine;
@@ -351,52 +347,94 @@ begin
   Result := FTotalBackups;
 end;
 
-procedure TRoutine.VerificarUltimosBackups;
+function TRoutine.VerificarNomeArquivo: string;
 var
-  lZipper: TAbZipper;
-  FileName: string;
-  lNumeroBackupsFeitos: Integer;
-  lListaBackups: TStringList;
+  BaseNome, NovoNome: string;
+  Contador: Integer;
+  Existe: Boolean;
 begin
-  lNumeroBackupsFeitos := 0;
-  lZipper := TAbZipper.Create(nil);
-  lListaBackups := TStringList.Create;
-  try
+  BaseNome := FDescricao + ' - ' + FCodigo + ' - ' +
+    FormatDateTime('dd-mm-yy', Now);
+  Contador := 0;
+
+  repeat
+
+    Existe := False;
+    if Contador = 0 then
+      NovoNome := BaseNome + '.zip'
+    else
+      NovoNome := Format('%s - (%d).zip', [BaseNome, Contador]);
     for var Item in TDirectory.GetFiles(FSettings.Diretorio, '*.zip') do
     begin
-      lZipper.OpenArchive(Item);
-      if lZipper.Version = FCodigo then
+      if SameText(ExtractFileName(Item), NovoNome) then
       begin
-        Inc(lNumeroBackupsFeitos);
-        lListaBackups.Add(Item);
+        Existe := True;
+        Break;
       end;
     end;
+    if Existe then
+      Inc(Contador)
+    else
+      Break;
 
-    if lNumeroBackupsFeitos = FTotalBackups then
+  until False;
+
+  Result := NovoNome;
+end;
+
+function TRoutine.EncontrarBackupsValidos: TStringList;
+var
+  Arquivo: string;
+begin
+  Result := TStringList.Create;
+  for Arquivo in TDirectory.GetFiles(FSettings.Diretorio, '*.zip') do
+  begin
+    if LocalizaCodigoEmZip(Arquivo) then
     begin
-      var
-      OldestFile := lListaBackups[0];
-      var
-      OldestFileAge := FileAge(lListaBackups[0]);
-      var
-        lFileAge: Integer;
-
-      for var i := 1 to lListaBackups.Count - 1 do
-      begin
-        lFileAge := FileAge(lListaBackups[i]);
-        if lFileAge < OldestFileAge then
-        begin
-          OldestFile := lListaBackups[i];
-          OldestFileAge := lFileAge;
-        end;
-      end;
-
-      DeleteFile(OldestFile);
+      Result.Add(Arquivo);
     end;
+  end;
+end;
 
+function TRoutine.ExcluirArquivoMaisAntigo(ListaArquivos: TStringList): Boolean;
+var
+  ArquivoMaisAntigo: string;
+  IdadeArquivoMaisAntigo, IdadeArquivoAtual: Integer;
+  i: Integer;
+begin
+  Result := False;
+  if ListaArquivos.Count = 0 then
+    Exit;
+
+  ArquivoMaisAntigo := ListaArquivos[0];
+  IdadeArquivoMaisAntigo := FileAge(ArquivoMaisAntigo);
+
+  for i := 1 to ListaArquivos.Count - 1 do
+  begin
+    IdadeArquivoAtual := FileAge(ListaArquivos[i]);
+    if IdadeArquivoAtual < IdadeArquivoMaisAntigo then
+    begin
+      ArquivoMaisAntigo := ListaArquivos[i];
+      IdadeArquivoMaisAntigo := IdadeArquivoAtual;
+    end;
+  end;
+
+  Result := DeleteFile(ArquivoMaisAntigo);
+end;
+
+function TRoutine.VerificarUltimosBackups: Boolean;
+var
+  ListaBackupsValidos: TStringList;
+begin
+  ListaBackupsValidos := EncontrarBackupsValidos;
+  try
+    Result := ListaBackupsValidos.Count = FTotalBackups;
+    if Result then
+    begin
+      ExcluirArquivoMaisAntigo(ListaBackupsValidos);
+    end;
   finally
-    lZipper.Free;
-    lListaBackups.Free;
+    ListaBackupsValidos.Free;
   end;
 end;
 

@@ -37,9 +37,4 @@ object DMRoutine: TDMRoutine
         Value = Null
       end>
   end
-  object sqlAuxRotina: TFDQuery
-    Connection = DM.database
-    Left = 72
-    Top = 376
-  end
 end

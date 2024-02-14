@@ -99,10 +99,10 @@ begin
       txt.Text := aRotina.TotalBackupsSalvos.ToString;
 
       txt := TListItemText(Objects.FindDrawable('Icon'));
-      txt.Text := '';
-
-      txt := TListItemText(Objects.FindDrawable('IconExcluir'));
       txt.Text := '';
+
+      txt := TListItemText(Objects.FindDrawable('Excluir'));
+      txt.Text := 'Excluir';
     end;
   except
     raise Exception.Create('Ocorreu um erro ao listar as rotinas');

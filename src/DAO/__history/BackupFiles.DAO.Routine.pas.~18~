@@ -23,7 +23,6 @@ type
     TabRotina: TFDQuery;
     TabRotinaFiltrada: TFDQuery;
     BuscaItensBackup: TFDQuery;
-    sqlAuxRotina: TFDQuery;
     procedure DataModuleCreate(Sender: TObject);
   private
     { Private declarations }

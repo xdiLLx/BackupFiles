@@ -2,19 +2,13 @@ unit BackupFiles.Controller.Interfaces;
 
 interface
 
-uses
-  BackupFiles.Model.Interfaces,
-  FMX.ListView,
-  System.Generics.Collections;
+uses BackupFiles.Model.Interfaces;
 
 type
 
   iControllerRoutine = interface
     ['{68320D65-C5DA-450E-B1E1-C81CA7F79891}']
     function Item: iRoutine;
-    function ListarRotinas: TList<iRoutine>; overload;
-    procedure ListarRotinas(var aListView: TListView; aPagina: integer;
-      aBusca: string; aLimparLista: boolean); overload;
   end;
 
   iControllerStorageSettings = interface

@@ -131,10 +131,6 @@ type
     procedure btnCancelarClick(Sender: TObject);
     procedure btnGravarClick(Sender: TObject);
     procedure lblPesquisaClick(Sender: TObject);
-    procedure btnExcluirRotinaClick(Sender: TObject);
-    procedure ListView1Paint(Sender: TObject; Canvas: TCanvas;
-      const ARect: TRectF);
-    procedure ListView1Exit(Sender: TObject);
   private
     procedure AplicaBordas(aValue: Integer);
     procedure FTPSelecionado(aValue: Boolean);
@@ -189,11 +185,6 @@ begin
   MudaPagina(tbItemConfigRotina);
 end;
 
-procedure TFormMenuPrincipal.btnExcluirRotinaClick(Sender: TObject);
-begin
-  TControllerRoutine.New.ListarRotinas(ListView1,1,edtPesquisa.Text,True);
-end;
-
 procedure TFormMenuPrincipal.btnGravarClick(Sender: TObject);
 begin
   MudaPagina(tabListaRotinas);
@@ -231,19 +222,6 @@ end;
 procedure TFormMenuPrincipal.lblPesquisaClick(Sender: TObject);
 begin
   edtPesquisa.SetFocus;
-end;
-
-procedure TFormMenuPrincipal.ListView1Exit(Sender: TObject);
-begin
-  ListView1.ItemIndex:= -1;
-end;
-
-procedure TFormMenuPrincipal.ListView1Paint(Sender: TObject; Canvas: TCanvas;
-  const ARect: TRectF);
-begin
-   if (ListView1.Items.Count >= 15) and (ListView1.Tag >= 0) then
-        if ListView1.GetItemRect(ListView1.Items.Count - 5).Bottom <= ListView1.Height then
-         TControllerRoutine.New.ListarRotinas(ListView1,ListView1.Tag + 1, edtPesquisa.Text, false);
 end;
 
 procedure TFormMenuPrincipal.MudaPagina(var aTabItem: TTabItem);
@@ -296,8 +274,6 @@ begin
   rectLogo.YRadius := aValue;
   rectTopo.XRadius := aValue;
   rectTopo.YRadius := aValue;
-  rectTopoGeral.XRadius := aValue;
-  rectTopoGeral.YRadius := aValue;
 end;
 
 end.

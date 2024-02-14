@@ -99,7 +99,7 @@ begin
       txt.Text := aRotina.TotalBackupsSalvos.ToString;
 
       txt := TListItemText(Objects.FindDrawable('Icon'));
-      txt.Text := '';
+      txt.Text := '';
 
       txt := TListItemText(Objects.FindDrawable('IconExcluir'));
       txt.Text := '';

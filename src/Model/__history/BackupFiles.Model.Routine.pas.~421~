@@ -70,13 +70,13 @@ type
     function BuscarDados(aCodigo: string): iRoutine;
     function Salvar: iRoutine;
     function IniciarBackup: iRoutine;
+    function ListarRotinas: TList<iRoutine>; overload;
+    function ListarRotinas(APagina: Integer; Busca: string)
+      : TList<iRoutine>; overload;
   public
     constructor Create;
     destructor Destroy; override;
     class function New: iRoutine;
-    class function ListarRotinas: TList<iRoutine>; overload;
-    class function ListarRotinas(APagina: Integer; Busca: string)
-      : TList<iRoutine>; overload;
   end;
 
 implementation
@@ -370,18 +370,18 @@ begin
   Result := FItemLista;
 end;
 
-class function TRoutine.ListarRotinas(APagina: Integer; Busca: string)
+function TRoutine.ListarRotinas(APagina: Integer; Busca: string)
   : TList<iRoutine>;
 begin
   DMRoutine.sqlAuxRotina.Active := False;
   DMRoutine.sqlAuxRotina.SQL.Clear;
-  DMRoutine.sqlAuxRotina.SQL.Add('SELECT R.* ');
-  DMRoutine.sqlAuxRotina.SQL.Add('FROM ROTINA R');
+  DMRoutine.sqlAuxRotina.SQL.Add('SELECT P.* ');
+  DMRoutine.sqlAuxRotina.SQL.Add('FROM TAB_PRODUTO P');
 
   // Filtro...
   if Busca <> '' then
   begin
-    DMRoutine.sqlAuxRotina.SQL.Add('WHERE R.DESCRICAO LIKE :BUSCA ');
+    DMRoutine.sqlAuxRotina.SQL.Add('WHERE P.DESCRICAO LIKE :BUSCA ');
     DMRoutine.sqlAuxRotina.ParamByName('BUSCA').Value := '%' + Busca + '%';
   end;
 
@@ -393,16 +393,16 @@ begin
 
   Result := TList<iRoutine>.Create;
 
-  DMRoutine.sqlAuxRotina.First;
-  while not DMRoutine.sqlAuxRotina.Eof do
+   DMRoutine.sqlAuxRotina.First;
+  while not  DMRoutine.sqlAuxRotina.Eof do
   begin
     Result.Add(TRoutine.New.BuscarDados(DMRoutine.sqlAuxRotina.FieldByName
       ('Codigo').AsString));
-    DMRoutine.sqlAuxRotina.Next;
+    DMRoutine.TabRotina.Next;
   end;
 end;
 
-class function TRoutine.ListarRotinas: TList<iRoutine>;
+function TRoutine.ListarRotinas: TList<iRoutine>;
 begin
   DMRoutine.TabRotina.Close;
   DMRoutine.TabRotina.Open;

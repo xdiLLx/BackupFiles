@@ -42,9 +42,6 @@ end;
 
 destructor TControllerRoutine.Destroy;
 begin
-  if Assigned(FListaRotinas) then
-    FListaRotinas.Free;
-
   inherited;
 end;
 
@@ -70,7 +67,7 @@ begin
   aListView.Tag := aPagina;
 
   FListaRotinas := TRoutine.ListarRotinas(aPagina, aBusca);
-  for var Item in FListaRotinas do
+  for var Item in fListaRotinas do
   begin
     AddRotina(Item, aListView);
   end;
@@ -99,10 +96,10 @@ begin
       txt.Text := aRotina.TotalBackupsSalvos.ToString;
 
       txt := TListItemText(Objects.FindDrawable('Icon'));
-      txt.Text := '';
-
-      txt := TListItemText(Objects.FindDrawable('IconExcluir'));
       txt.Text := '';
+
+      txt := TListItemText(Objects.FindDrawable('Excluir'));
+      txt.Text := 'Excluir';
     end;
   except
     raise Exception.Create('Ocorreu um erro ao listar as rotinas');
@@ -111,8 +108,7 @@ end;
 
 function TControllerRoutine.ListarRotinas: TList<iRoutine>;
 begin
-  FListaRotinas := TRoutine.ListarRotinas;
-  Result:= FListaRotinas;
+  Result := TRoutine.ListarRotinas;
 end;
 
 class function TControllerRoutine.New: iControllerRoutine;

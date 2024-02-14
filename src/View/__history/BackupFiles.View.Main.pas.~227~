@@ -134,7 +134,6 @@ type
     procedure btnExcluirRotinaClick(Sender: TObject);
     procedure ListView1Paint(Sender: TObject; Canvas: TCanvas;
       const ARect: TRectF);
-    procedure ListView1Exit(Sender: TObject);
   private
     procedure AplicaBordas(aValue: Integer);
     procedure FTPSelecionado(aValue: Boolean);
@@ -231,11 +230,6 @@ end;
 procedure TFormMenuPrincipal.lblPesquisaClick(Sender: TObject);
 begin
   edtPesquisa.SetFocus;
-end;
-
-procedure TFormMenuPrincipal.ListView1Exit(Sender: TObject);
-begin
-  ListView1.ItemIndex:= -1;
 end;
 
 procedure TFormMenuPrincipal.ListView1Paint(Sender: TObject; Canvas: TCanvas;

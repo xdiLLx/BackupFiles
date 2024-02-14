@@ -2,10 +2,7 @@ unit BackupFiles.Controller.Interfaces;
 
 interface
 
-uses
-  BackupFiles.Model.Interfaces,
-  FMX.ListView,
-  System.Generics.Collections;
+uses BackupFiles.Model.Interfaces;
 
 type
 

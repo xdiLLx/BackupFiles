@@ -74,8 +74,8 @@ type
     constructor Create;
     destructor Destroy; override;
     class function New: iRoutine;
-    class function ListarRotinas: TList<iRoutine>; overload;
-    class function ListarRotinas(APagina: Integer; Busca: string)
+    function ListarRotinas: TList<iRoutine>; overload;
+    function ListarRotinas(APagina: Integer; Busca: string)
       : TList<iRoutine>; overload;
   end;
 
@@ -370,7 +370,7 @@ begin
   Result := FItemLista;
 end;
 
-class function TRoutine.ListarRotinas(APagina: Integer; Busca: string)
+function TRoutine.ListarRotinas(APagina: Integer; Busca: string)
   : TList<iRoutine>;
 begin
   DMRoutine.sqlAuxRotina.Active := False;
@@ -398,11 +398,11 @@ begin
   begin
     Result.Add(TRoutine.New.BuscarDados(DMRoutine.sqlAuxRotina.FieldByName
       ('Codigo').AsString));
-    DMRoutine.sqlAuxRotina.Next;
+    DMRoutine.TabRotina.Next;
   end;
 end;
 
-class function TRoutine.ListarRotinas: TList<iRoutine>;
+function TRoutine.ListarRotinas: TList<iRoutine>;
 begin
   DMRoutine.TabRotina.Close;
   DMRoutine.TabRotina.Open;

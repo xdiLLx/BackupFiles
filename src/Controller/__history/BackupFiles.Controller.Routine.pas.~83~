@@ -12,7 +12,6 @@ uses
 type
   TControllerRoutine = class(TInterfacedObject, iControllerRoutine)
   private
-    FListaRotinas: TList<iRoutine>;
     procedure AddRotina(aRotina: iRoutine; aListView: TListView);
     { Campos privados }
   public
@@ -42,9 +41,6 @@ end;
 
 destructor TControllerRoutine.Destroy;
 begin
-  if Assigned(FListaRotinas) then
-    FListaRotinas.Free;
-
   inherited;
 end;
 
@@ -69,11 +65,12 @@ begin
   // Salva a pagina atual a ser exibida...
   aListView.Tag := aPagina;
 
-  FListaRotinas := TRoutine.ListarRotinas(aPagina, aBusca);
-  for var Item in FListaRotinas do
+  lListaRotinas := TRoutine.ListarRotinas(aPagina, aBusca);
+  for var Item in lListaRotinas do
   begin
     AddRotina(Item, aListView);
   end;
+  lListaRotinas.Free;
 end;
 
 procedure TControllerRoutine.AddRotina(aRotina: iRoutine; aListView: TListView);
@@ -99,10 +96,10 @@ begin
       txt.Text := aRotina.TotalBackupsSalvos.ToString;
 
       txt := TListItemText(Objects.FindDrawable('Icon'));
-      txt.Text := '';
-
-      txt := TListItemText(Objects.FindDrawable('IconExcluir'));
       txt.Text := '';
+
+      txt := TListItemText(Objects.FindDrawable('Excluir'));
+      txt.Text := 'Excluir';
     end;
   except
     raise Exception.Create('Ocorreu um erro ao listar as rotinas');
@@ -111,8 +108,7 @@ end;
 
 function TControllerRoutine.ListarRotinas: TList<iRoutine>;
 begin
-  FListaRotinas := TRoutine.ListarRotinas;
-  Result:= FListaRotinas;
+  Result := TRoutine.ListarRotinas;
 end;
 
 class function TControllerRoutine.New: iControllerRoutine;

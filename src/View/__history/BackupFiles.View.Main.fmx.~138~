@@ -2022,7 +2022,6 @@ object FormMenuPrincipal: TFormMenuPrincipal
               TabOrder = 1
               ParentShowHint = False
               ShowHint = False
-              OnExit = ListView1Exit
               OnPaint = ListView1Paint
               ItemAppearance.HeaderHeight = 1
               ItemAppearance.FooterHeight = 1
@@ -2088,7 +2087,6 @@ object FormMenuPrincipal: TFormMenuPrincipal
               ShowSelection = False
               SearchAlwaysOnTop = False
               SelectionCrossfade = True
-              ControlType = Platform
             end
           end
         end

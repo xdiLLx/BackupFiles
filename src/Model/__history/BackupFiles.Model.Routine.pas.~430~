@@ -398,7 +398,7 @@ begin
   begin
     Result.Add(TRoutine.New.BuscarDados(DMRoutine.sqlAuxRotina.FieldByName
       ('Codigo').AsString));
-    DMRoutine.sqlAuxRotina.Next;
+    DMRoutine.TabRotina.Next;
   end;
 end;
 

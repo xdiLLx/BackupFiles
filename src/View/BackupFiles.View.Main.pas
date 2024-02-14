@@ -9,7 +9,8 @@ uses
   FMX.Controls.Presentation, FMX.StdCtrls, GDCornerButton, Winapi.Windows,
   FMX.TabControl, FMX.Edit, FMX.DateTimeCtrls, FMX.Effects, FMX.ListBox,
   FMX.Layouts, FMX.ListView.Types, FMX.ListView.Appearances,
-  FMX.ListView.Adapters.Base, FMX.ListView;
+  FMX.ListView.Adapters.Base, FMX.ListView, BackupFiles.Controller.BackupItem,
+  BackupFiles.Controller.StorageSettings, BackupFiles.Model.Interfaces;
 
 type
   TFormMenuPrincipal = class(TForm)
@@ -57,7 +58,7 @@ type
     edtLimiteBackups: TEdit;
     lblHorario: TLabel;
     rectHorario: TRectangle;
-    TimeEdit1: TTimeEdit;
+    tedtHorario: TTimeEdit;
     rectBaseStorage: TRectangle;
     lblArmazenamento: TLabel;
     Rectangle2: TRectangle;
@@ -86,7 +87,7 @@ type
     edtPorta: TEdit;
     lblPorta: TLabel;
     Rectangle10: TRectangle;
-    Rectangle14: TRectangle;
+    rectBaseItens: TRectangle;
     ShadowEffect4: TShadowEffect;
     btnAdicionarItem: TGDCornerButton;
     Label4: TLabel;
@@ -108,8 +109,6 @@ type
     lblPesquisa: TLabel;
     btnCriarRotina: TGDCornerButton;
     Label6: TLabel;
-    btnExcluirRotina: TGDCornerButton;
-    Label8: TLabel;
     rectBotoes: TRectangle;
     rectGrid: TRectangle;
     rectCampos: TRectangle;
@@ -135,10 +134,16 @@ type
     procedure ListView1Paint(Sender: TObject; Canvas: TCanvas;
       const ARect: TRectF);
     procedure ListView1Exit(Sender: TObject);
+    procedure btnCriarRotinaClick(Sender: TObject);
+    procedure FormShow(Sender: TObject);
   private
+    FCriando: Boolean;
+    FCodigoRotina: string;
     procedure AplicaBordas(aValue: Integer);
     procedure FTPSelecionado(aValue: Boolean);
     procedure MudaPagina(var aTabItem: TTabItem);
+    procedure LimparCampos;
+    procedure GravarDados;
     { Private declarations }
   public
     { Public declarations }
@@ -189,14 +194,98 @@ begin
   MudaPagina(tbItemConfigRotina);
 end;
 
+procedure TFormMenuPrincipal.btnCriarRotinaClick(Sender: TObject);
+begin
+  MudaPagina(tbVisualizaRotina);
+  MudaPagina(tbItemConfigRotina);
+  FCriando := True;
+  LimparCampos;
+  edtDescricaoRotina.SetFocus;
+end;
+
+procedure TFormMenuPrincipal.LimparCampos;
+  procedure Limpar(aControle: TFmxObject);
+  var
+    Child: TFmxObject;
+    I: Integer;
+  begin
+    // Verifica se o componente atual é um TEdit ou TTimeEdit e limpa conforme o caso
+    if aControle is TEdit then
+      TEdit(aControle).Text := ''
+    else if aControle is TTimeEdit then
+      TTimeEdit(aControle).Time := StrToTime('00:00')
+    else if aControle is TListBox then
+      TListBox(aControle).Clear;
+
+    // Itera por todos os filhos do componente atual
+    for I := 0 to aControle.ChildrenCount - 1 do
+    begin
+      Child := aControle.Children[I];
+      Limpar(Child); // Chamada recursiva para o filho
+    end;
+  end;
+
+begin
+  Limpar(rectBaseConfigRotina);
+  Limpar(rectBaseStorage);
+  Limpar(rectBaseItens);
+end;
+
 procedure TFormMenuPrincipal.btnExcluirRotinaClick(Sender: TObject);
 begin
-  TControllerRoutine.New.ListarRotinas(ListView1,1,edtPesquisa.Text,True);
+  TControllerRoutine.New.ListarRotinas(ListView1, 1, edtPesquisa.Text, True);
 end;
 
 procedure TFormMenuPrincipal.btnGravarClick(Sender: TObject);
 begin
   MudaPagina(tabListaRotinas);
+  GravarDados;
+end;
+
+procedure TFormMenuPrincipal.GravarDados;
+var
+  lRotina: iRoutine;
+  lConfig: iStorageSettings;
+begin
+  if FCriando then
+  begin
+    lRotina := TControllerRoutine.New.Item;
+    case cbModeloArmazenamento.ItemIndex of
+      0:
+        lConfig := TControllerStorageSettings.New.Item(Local);
+      1:
+        lConfig := TControllerStorageSettings.New.Item(FTP);
+    end;
+  end
+  else
+  begin
+    lRotina := TControllerRoutine.New.Item.BuscarDados(FCodigoRotina);
+    lConfig := lRotina.Configuracao;
+  end;
+
+  lConfig.
+          Diretorio(edtDiretorio.Text).
+          Servidor(edtServidor.Text).
+          Usuario(edtUsuario.Text).
+          Senha(edtSenhaServidor.Text).
+          Porta(edtPorta.Text.ToInteger);
+
+  case cbModeloArmazenamento.ItemIndex of
+    0:
+      lConfig.TipoConfiguracao(Local);
+    1:
+      lConfig.TipoConfiguracao(FTP);
+  end;
+
+  if edtSenhaArquivo.Text <> '' then
+    lConfig.SenhaDeArquivo(edtSenhaArquivo.Text);
+
+  lRotina.
+          Descricao(edtDescricaoRotina.Text).
+          Horario(tedtHorario.Time).
+          TotalBackupsSalvos(edtLimiteBackups.Text.ToInteger).
+          Configuracao(lConfig);
+
 end;
 
 procedure TFormMenuPrincipal.btnListaDeArquivosClick(Sender: TObject);
@@ -212,6 +301,11 @@ end;
 procedure TFormMenuPrincipal.btnVisualizarRotinaClick(Sender: TObject);
 begin
   MudaPagina(tbVisualizaRotina);
+end;
+
+procedure TFormMenuPrincipal.FormShow(Sender: TObject);
+begin
+  FCriando := False;
 end;
 
 procedure TFormMenuPrincipal.FTPSelecionado(aValue: Boolean);
@@ -235,15 +329,17 @@ end;
 
 procedure TFormMenuPrincipal.ListView1Exit(Sender: TObject);
 begin
-  ListView1.ItemIndex:= -1;
+  ListView1.ItemIndex := -1;
 end;
 
 procedure TFormMenuPrincipal.ListView1Paint(Sender: TObject; Canvas: TCanvas;
   const ARect: TRectF);
 begin
-   if (ListView1.Items.Count >= 15) and (ListView1.Tag >= 0) then
-        if ListView1.GetItemRect(ListView1.Items.Count - 5).Bottom <= ListView1.Height then
-         TControllerRoutine.New.ListarRotinas(ListView1,ListView1.Tag + 1, edtPesquisa.Text, false);
+  if (ListView1.Items.Count >= 15) and (ListView1.Tag >= 0) then
+    if ListView1.GetItemRect(ListView1.Items.Count - 5).Bottom <= ListView1.Height
+    then
+      TControllerRoutine.New.ListarRotinas(ListView1, ListView1.Tag + 1,
+        edtPesquisa.Text, False);
 end;
 
 procedure TFormMenuPrincipal.MudaPagina(var aTabItem: TTabItem);
@@ -296,8 +392,8 @@ begin
   rectLogo.YRadius := aValue;
   rectTopo.XRadius := aValue;
   rectTopo.YRadius := aValue;
-  rectTopoGeral.XRadius := aValue;
-  rectTopoGeral.YRadius := aValue;
+  // rectTopoGeral.XRadius := aValue;
+  // rectTopoGeral.YRadius := aValue;
 end;
 
 end.

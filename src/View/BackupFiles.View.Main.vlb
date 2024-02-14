@@ -37,9 +37,6 @@ Coordinates=482,506,65,36
 [Label1]
 Coordinates=155,232,53,58
 
-[TimeEdit1]
-Coordinates=934,10,138,58
-
 [lblNomeProjeto]
 Coordinates=333,10,103,58
 
@@ -69,9 +66,6 @@ Coordinates=10,506,65,36
 
 [tabControlGeral]
 Coordinates=1112,460,106,36
-
-[Rectangle14]
-Coordinates=1015,460,87,36
 
 [ShadowEffect2]
 Coordinates=877,386,101,36
@@ -247,4 +241,10 @@ Coordinates=160,460,69,36
 
 [tabListaRotinas]
 Coordinates=627,368,69,36
+
+[tedtHorario]
+Coordinates=934,10,138,58
+
+[rectBaseItens]
+Coordinates=1015,460,87,36
 

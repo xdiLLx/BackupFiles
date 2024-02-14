@@ -117,6 +117,13 @@ type
     lblCamposTotalBackup: TLabel;
     lblCamposAcoes: TLabel;
     ListView1: TListView;
+    tabConfiguracao: TTabItem;
+    rectTopoConfig: TRectangle;
+    btnMinimizarConfig: TGDCornerButton;
+    btnExpandirConfig: TGDCornerButton;
+    btnFecharConfig: TGDCornerButton;
+    lblCaminhoConfig: TLabel;
+    TimerPesquisa: TTimer;
     procedure rectTopoMouseDown(Sender: TObject; Button: TMouseButton;
       Shift: TShiftState; X, Y: Single);
     procedure rectTopoResized(Sender: TObject);
@@ -136,6 +143,9 @@ type
     procedure ListView1Exit(Sender: TObject);
     procedure btnCriarRotinaClick(Sender: TObject);
     procedure FormShow(Sender: TObject);
+    procedure btnBuscarDiretorioClick(Sender: TObject);
+    procedure TimerPesquisaTimer(Sender: TObject);
+    procedure edtPesquisaTyping(Sender: TObject);
   private
     FCriando: Boolean;
     FCodigoRotina: string;
@@ -144,6 +154,7 @@ type
     procedure MudaPagina(var aTabItem: TTabItem);
     procedure LimparCampos;
     procedure GravarDados;
+    procedure Pesquisar;
     { Private declarations }
   public
     { Public declarations }
@@ -179,14 +190,24 @@ begin
   end;
 end;
 
+procedure TFormMenuPrincipal.btnBuscarDiretorioClick(Sender: TObject);
+var
+  lDiretorio: string;
+begin
+  if SelectDirectory('Selecione o local para salvar', '', lDiretorio) then
+    edtDiretorio.Text := lDiretorio;
+end;
+
 procedure TFormMenuPrincipal.btnCancelarClick(Sender: TObject);
 begin
   MudaPagina(tabListaRotinas);
+  FCriando := False;
+  LimparCampos;
 end;
 
 procedure TFormMenuPrincipal.btnConfigClick(Sender: TObject);
 begin
-  MudaPagina(tabListaRotinas);
+  MudaPagina(tabConfiguracao);
 end;
 
 procedure TFormMenuPrincipal.btnConfiguracaoProjetoClick(Sender: TObject);
@@ -240,6 +261,7 @@ procedure TFormMenuPrincipal.btnGravarClick(Sender: TObject);
 begin
   MudaPagina(tabListaRotinas);
   GravarDados;
+  LimparCampos;
 end;
 
 procedure TFormMenuPrincipal.GravarDados;
@@ -247,45 +269,55 @@ var
   lRotina: iRoutine;
   lConfig: iStorageSettings;
 begin
-  if FCriando then
-  begin
-    lRotina := TControllerRoutine.New.Item;
+  try
+    if FCriando then
+    begin
+      lRotina := TControllerRoutine.New.Item;
+      case cbModeloArmazenamento.ItemIndex of
+        0:
+          lConfig := TControllerStorageSettings.New.Item(Local);
+        1:
+          lConfig := TControllerStorageSettings.New.Item(FTP);
+      end;
+    end
+    else
+    begin
+      lRotina := TControllerRoutine.New.Item.BuscarDados(FCodigoRotina);
+      lConfig := lRotina.Configuracao;
+    end;
+
+    lConfig.Diretorio(edtDiretorio.Text).Servidor(edtServidor.Text)
+      .Usuario(edtUsuario.Text).Senha(edtSenhaServidor.Text);
+    if edtPorta.Text <> '' then
+      lConfig.Porta(edtPorta.Text.ToInteger);
+
     case cbModeloArmazenamento.ItemIndex of
       0:
-        lConfig := TControllerStorageSettings.New.Item(Local);
+        lConfig.TipoConfiguracao(Local);
       1:
-        lConfig := TControllerStorageSettings.New.Item(FTP);
+        lConfig.TipoConfiguracao(FTP);
     end;
-  end
-  else
-  begin
-    lRotina := TControllerRoutine.New.Item.BuscarDados(FCodigoRotina);
-    lConfig := lRotina.Configuracao;
+
+    if edtSenhaArquivo.Text <> '' then
+      lConfig.SenhaDeArquivo(edtSenhaArquivo.Text);
+
+    lRotina.Descricao(edtDescricaoRotina.Text).Horario(tedtHorario.Time)
+      .TotalBackupsSalvos(edtLimiteBackups.Text.ToInteger)
+      .Configuracao(lConfig);
+
+    lRotina.RemoverItens;
+    for var Item in lbItens.Items do
+    begin
+      lRotina.AdicionarItem(TControllerBackupItem.New.Item(lRotina.Codigo)
+        .Caminho(Item));
+    end;
+
+    lConfig.Salvar;
+    lRotina.Salvar;
+  finally
+    TControllerRoutine.New.ListarRotinas(ListView1, ListView1.Tag,
+      edtPesquisa.Text, True);
   end;
-
-  lConfig.
-          Diretorio(edtDiretorio.Text).
-          Servidor(edtServidor.Text).
-          Usuario(edtUsuario.Text).
-          Senha(edtSenhaServidor.Text).
-          Porta(edtPorta.Text.ToInteger);
-
-  case cbModeloArmazenamento.ItemIndex of
-    0:
-      lConfig.TipoConfiguracao(Local);
-    1:
-      lConfig.TipoConfiguracao(FTP);
-  end;
-
-  if edtSenhaArquivo.Text <> '' then
-    lConfig.SenhaDeArquivo(edtSenhaArquivo.Text);
-
-  lRotina.
-          Descricao(edtDescricaoRotina.Text).
-          Horario(tedtHorario.Time).
-          TotalBackupsSalvos(edtLimiteBackups.Text.ToInteger).
-          Configuracao(lConfig);
-
 end;
 
 procedure TFormMenuPrincipal.btnListaDeArquivosClick(Sender: TObject);
@@ -300,12 +332,18 @@ end;
 
 procedure TFormMenuPrincipal.btnVisualizarRotinaClick(Sender: TObject);
 begin
-  MudaPagina(tbVisualizaRotina);
+  if tabControlGeral.ActiveTab = tbVisualizaRotina then
+    btnCancelarClick(btnCancelar)
+  else
+    MudaPagina(tabListaRotinas);
 end;
 
 procedure TFormMenuPrincipal.FormShow(Sender: TObject);
 begin
   FCriando := False;
+  MudaPagina(tabListaRotinas);
+  TControllerRoutine.New.ListarRotinas(ListView1, ListView1.Tag,
+    edtPesquisa.Text, True);
 end;
 
 procedure TFormMenuPrincipal.FTPSelecionado(aValue: Boolean);
@@ -325,6 +363,12 @@ end;
 procedure TFormMenuPrincipal.lblPesquisaClick(Sender: TObject);
 begin
   edtPesquisa.SetFocus;
+end;
+
+procedure TFormMenuPrincipal.Pesquisar;
+begin
+  TControllerRoutine.New.ListarRotinas(ListView1, ListView1.Tag,
+    edtPesquisa.Text, True);
 end;
 
 procedure TFormMenuPrincipal.ListView1Exit(Sender: TObject);
@@ -351,9 +395,12 @@ begin
   // rectTopo.Parent := aTabItem;
 
   if lTabControl = tabControlGeral then
-    lblCaminho.Text := 'Rotinas  /  ' + aTabItem.Text
+  begin
+    lblCaminhoGeral.Text := aTabItem.Text;
+    lblCaminhoConfig.Text := aTabItem.Text;
+  end
   else
-    lblCaminho.Text := 'Rotinas  /  ' + lblNomeProjeto.Text + '  /  ' +
+    lblCaminho.Text := 'Lista de Rotinas  /  ' + lblNomeProjeto.Text + '  /  ' +
       aTabItem.Text;
 
   lTabControl.ActiveTab := aTabItem;
@@ -369,6 +416,12 @@ begin
   end;
 end;
 
+procedure TFormMenuPrincipal.edtPesquisaTyping(Sender: TObject);
+begin
+  TimerPesquisa.Enabled := False;
+  TimerPesquisa.Enabled := True;
+end;
+
 procedure TFormMenuPrincipal.rectTopoMouseDown(Sender: TObject;
   Button: TMouseButton; Shift: TShiftState; X, Y: Single);
 begin
@@ -382,6 +435,12 @@ begin
     AplicaBordas(0)
   else
     AplicaBordas(20)
+end;
+
+procedure TFormMenuPrincipal.TimerPesquisaTimer(Sender: TObject);
+begin
+  TimerPesquisa.Enabled := False;
+  Pesquisar;
 end;
 
 procedure TFormMenuPrincipal.AplicaBordas(aValue: Integer);

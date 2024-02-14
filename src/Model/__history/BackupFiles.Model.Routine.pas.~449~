@@ -1,0 +1,721 @@
+unit BackupFiles.Model.Routine;
+
+interface
+
+uses
+  BackupFiles.Controller.Routine,
+  BackupFiles.Model.Interfaces,
+  System.Generics.Collections,
+  BackupFiles.DAO.Routine,
+  BackupFiles.Controller.StorageSettings,
+  BackupFiles.Controller.BackupItem,
+  AbZipper,
+  AbArcTyp,
+  AbUtils,
+  AbZipKit,
+  System.IOUtils,
+  System.Classes,
+  System.SysUtils,
+  System.DateUtils,
+  IdFTP,
+  IdFTPList;
+
+type
+  TRoutine = class(TInterfacedObject, iRoutine)
+  strict private
+    function GenerateUniqueCode: string;
+    procedure AtualizarNoBanco;
+    procedure InserirNoBanco;
+    procedure BuscaItensRotina;
+    procedure SalvarItens;
+    procedure IniciarBackupLocal;
+    function CriarBackupTemporario: string;
+    procedure IniciarBackupFTP;
+    function VerificarUltimosBackups: Boolean; overload;
+    function VerificarUltimosBackups(FTP: TIdFTP; const BaseDir: string;
+      TotalBackups: Integer): Boolean; overload;
+    function VerificarNomeArquivo: string; overload;
+    function VerificarNomeArquivo(FTP: TIdFTP; const BaseDir: string)
+      : string; overload;
+    function LocalizaCodigoEmZip(const Value: string): Boolean;
+    function EncontrarBackupsValidos: TStringList; overload;
+    function EncontrarBackupsValidos(FTP: TIdFTP; const BaseDir: string)
+      : TStringList; overload;
+    function ExcluirArquivoMaisAntigo(ListaArquivos: TStringList)
+      : Boolean; overload;
+    function ExcluirArquivoMaisAntigo(FTP: TIdFTP; ListaDetalhes: TStringList;
+      const BaseDir: string): Boolean; overload;
+    function RetornaDataMotificacao(FTP: TIdFTP; const FileName: string)
+      : TDateTime;
+
+  private
+    { Campos privados }
+    FCodigo: string;
+    FDescricao: string;
+    FHorario: TDateTime;
+    FTotalBackups: Integer;
+    FItemLista: TList<iBackupItem>;
+    FSettings: iStorageSettings;
+    function Codigo: string;
+    function Horario(Value: TDateTime): iRoutine; overload;
+    function Horario: TDateTime; overload;
+    function TotalBackupsSalvos(Value: Integer): iRoutine; overload;
+    function TotalBackupsSalvos: Integer; overload;
+    function AdicionarItem(Value: iBackupItem): iRoutine;
+    function ListarItens: TList<iBackupItem>;
+    function Configuracao(Value: iStorageSettings): iRoutine; overload;
+    function Configuracao: iStorageSettings; overload;
+    function Descricao: string; overload;
+    function Descricao(Value: string): iRoutine; overload;
+    function BuscarDados(aCodigo: string): iRoutine;
+    function Salvar: iRoutine;
+    function IniciarBackup: iRoutine;
+    function RemoverItens(Value: iBackupItem): iRoutine;
+    procedure Deletar;
+  public
+    constructor Create;
+    destructor Destroy; override;
+    class function New: iRoutine;
+    class function ListarRotinas: TList<iRoutine>; overload;
+    class function ListarRotinas(APagina: Integer; Busca: string)
+      : TList<iRoutine>; overload;
+  end;
+
+implementation
+
+function TRoutine.GenerateUniqueCode: string;
+var
+  GUID: TGUID;
+  Timestamp: Int64;
+  RandomPart: string;
+begin
+  // Gera um GUID
+  CreateGUID(GUID);
+  // Converte o GUID em string e remove os caracteres não numéricos
+  Result := GUIDToString(GUID).Replace('{', '').Replace('}', '')
+    .Replace('-', '');
+  // Pega apenas os primeiros 18 caracteres para deixar espaço para o resto
+  Result := Copy(Result, 1, 18);
+  // Gera um timestamp
+  Timestamp := DateTimeToUnix(Now, False);
+  // Converte o timestamp para string e pega os últimos 7 dígitos
+  RandomPart := IntToStr(Timestamp mod 10000000);
+  // Assegura que a parte aleatória tenha 7 caracteres, preenchendo com '0' se necessário
+  while Length(RandomPart) < 7 do
+    RandomPart := '0' + RandomPart;
+  // Combina as partes para formar um código único de 25 caracteres
+  Result := Copy(Result + RandomPart, 1, 25);
+end;
+
+{ TRoutine }
+
+function TRoutine.AdicionarItem(Value: iBackupItem): iRoutine;
+begin
+  if FItemLista.IndexOf(Value) = -1 then
+    FItemLista.Add(Value)
+  else
+    raise Exception.Create('O arquivo ' + Value.Nome +
+      ' ja foi adicionado a lista');
+  Result := Self;
+end;
+
+procedure TRoutine.AtualizarNoBanco;
+begin
+  DMRoutine.TabRotinaFiltrada.Close;
+  DMRoutine.TabRotinaFiltrada.ParamByName('codigo').AsString := Self.FCodigo;
+  DMRoutine.TabRotinaFiltrada.Open;
+
+  DMRoutine.TabRotinaFiltrada.Edit;
+
+  DMRoutine.TabRotinaFiltrada.FieldByName('Horario').AsDateTime :=
+    FHorario.GetTime;
+  DMRoutine.TabRotinaFiltrada.FieldByName('Total_backup').AsInteger :=
+    FTotalBackups;
+  DMRoutine.TabRotinaFiltrada.FieldByName('CodigoConfiguracao').AsString :=
+    FSettings.Codigo;
+  DMRoutine.TabRotinaFiltrada.FieldByName('Codigo').AsString := FCodigo;
+  DMRoutine.TabRotinaFiltrada.FieldByName('Descricao').AsString := FDescricao;
+
+  DMRoutine.TabRotinaFiltrada.Post;
+
+  SalvarItens;
+end;
+
+procedure TRoutine.SalvarItens;
+begin
+
+  for var Item in FItemLista do
+  begin
+    Item.Salvar;
+  end;
+end;
+
+procedure TRoutine.BuscaItensRotina;
+begin
+  DMRoutine.BuscaItensBackup.Close;
+  DMRoutine.BuscaItensBackup.ParamByName('codigorotina').AsString := FCodigo;
+  DMRoutine.BuscaItensBackup.Open;
+
+  FItemLista.Clear;
+  DMRoutine.BuscaItensBackup.First;
+  while not DMRoutine.BuscaItensBackup.Eof do
+  begin
+    FItemLista.Add(TControllerBackupItem.New.Item(FCodigo)
+      .BuscarDados(DMRoutine.BuscaItensBackup.FieldByName('Codigo').AsString));
+
+    DMRoutine.BuscaItensBackup.Next;
+  end;
+
+end;
+
+function TRoutine.BuscarDados(aCodigo: string): iRoutine;
+var
+  lCodigoConfig: string;
+
+begin
+  if (aCodigo.IsEmpty) or (Length(aCodigo) <> 25) then
+    raise Exception.Create('Código de item inválido para busca');
+
+  DMRoutine.TabRotinaFiltrada.Close;
+  DMRoutine.TabRotinaFiltrada.ParamByName('codigo').AsString := aCodigo;
+  DMRoutine.TabRotinaFiltrada.Open;
+
+  FDescricao := DMRoutine.TabRotinaFiltrada.FieldByName('Descricao').AsString;
+  FHorario := DMRoutine.TabRotinaFiltrada.FieldByName('Horario').AsDateTime;
+  FTotalBackups := DMRoutine.TabRotinaFiltrada.FieldByName('Total_Backup')
+    .AsInteger;
+  lCodigoConfig := DMRoutine.TabRotinaFiltrada.FieldByName
+    ('CodigoConfiguracao').AsString;
+  FCodigo := DMRoutine.TabRotinaFiltrada.FieldByName('Codigo').AsString;
+  FSettings := TControllerStorageSettings.New.BuscarConfiguracao(lCodigoConfig);
+  BuscaItensRotina;
+
+  Result := Self;
+end;
+
+function TRoutine.Codigo: string;
+begin
+  Result := FCodigo;
+end;
+
+function TRoutine.Configuracao: iStorageSettings;
+begin
+  Result := FSettings;
+end;
+
+function TRoutine.Configuracao(Value: iStorageSettings): iRoutine;
+begin
+  Result := Self;
+  FSettings := Value;
+end;
+
+constructor TRoutine.Create;
+begin
+  FCodigo := GenerateUniqueCode;
+  FItemLista := TList<iBackupItem>.Create;
+end;
+
+function TRoutine.CriarBackupTemporario: string;
+var
+  lZipper: TAbZipper;
+  ArquivoTemporario: string;
+begin
+  Result := '';
+  lZipper := TAbZipper.Create(nil);
+  try
+    lZipper.StoreOptions := [soStripDrive, soStripPath];
+    lZipper.FileName := FDescricao + ' - ' + FCodigo + ' - ' +
+      FormatDateTime('dd-mm-yy', Now) + '.zip';
+    lZipper.OpenArchive(TPath.GetTempPath + lZipper.FileName);
+    if FSettings.SenhaDeArquivo <> '' then
+      lZipper.Password := FSettings.SenhaDeArquivo;
+    ArquivoTemporario := TPath.GetTempPath;
+    for var Item in FItemLista do
+    begin
+      ArquivoTemporario := ArquivoTemporario + ExtractFileName(Item.Caminho);
+      TFile.Copy(Item.Caminho, ArquivoTemporario, true);
+      lZipper.AddFiles((ArquivoTemporario), 0);
+      lZipper.Save;
+      TFile.Delete((ArquivoTemporario));
+    end;
+    lZipper.Save;
+    Result := lZipper.FileName;
+    lZipper.CloseArchive;
+  finally
+    lZipper.Free;
+  end;
+end;
+
+procedure TRoutine.Deletar;
+begin
+  DMRoutine.sqlAuxRotina.Close;
+  DMRoutine.sqlAuxRotina.SQL.Text :=
+    'DELETE FROM ROTINA R WHERE R.CODIGO = :COD';
+  DMRoutine.sqlAuxRotina.FieldByName('COD').AsString := Self.FCodigo;
+  DMRoutine.sqlAuxRotina.ExecSQL;
+end;
+
+function TRoutine.Descricao(Value: string): iRoutine;
+begin
+  if Value = '' then
+    raise Exception.Create('A Descrição não pode ficar em branco');
+  FDescricao := Value;
+  Result := Self;
+end;
+
+function TRoutine.Descricao: string;
+begin
+  Result := FDescricao;
+end;
+
+destructor TRoutine.Destroy;
+begin
+  FItemLista.Free;
+  inherited;
+end;
+
+function TRoutine.Horario: TDateTime;
+begin
+  Result := FHorario;
+end;
+
+function TRoutine.IniciarBackup: iRoutine;
+begin
+  if not Assigned(FSettings) then
+    raise Exception.Create
+      ('Não é possível iniciar backup sem uma configuração estabelecida');
+
+  if FSettings.TipoConfiguracao = FTP then
+    IniciarBackupFTP
+  else
+    IniciarBackupLocal;
+
+  Result := Self;
+end;
+
+procedure TRoutine.IniciarBackupFTP;
+var
+  FTP: TIdFTP;
+  lCaminhoBackupTemporario, lNomeArquivoFTP: string;
+  lBaseDir: string;
+begin
+  lBaseDir := FSettings.Diretorio;
+  lCaminhoBackupTemporario := CriarBackupTemporario;
+
+  // Cria e configura o objeto FTP
+  FTP := TIdFTP.Create(nil);
+  try
+    FTP.Host := FSettings.Servidor;
+    FTP.Port := FSettings.Porta;
+    FTP.Username := FSettings.Usuario;
+    FTP.Password := FSettings.Senha;
+    FTP.ReadTimeout := 10000;
+    FTP.Passive := true;
+    FTP.Connect;
+    try
+      FTP.ChangeDir(lBaseDir);
+      VerificarUltimosBackups(FTP, lBaseDir, FTotalBackups);
+      lNomeArquivoFTP := VerificarNomeArquivo(FTP, lBaseDir);
+      FTP.Passive := False;
+      FTP.Put(lCaminhoBackupTemporario, lNomeArquivoFTP);
+
+    finally
+      FTP.Disconnect;
+    end;
+  finally
+    FTP.Free;
+  end;
+  DeleteFile(lCaminhoBackupTemporario);
+
+end;
+
+procedure TRoutine.IniciarBackupLocal;
+var
+  lZipper: TAbZipper;
+  ArquivoTemporario: string;
+begin
+
+  lZipper := TAbZipper.Create(nil);
+  try
+    VerificarUltimosBackups;
+    lZipper.StoreOptions := [soStripDrive, soStripPath];
+    lZipper.FileName := VerificarNomeArquivo;
+    lZipper.OpenArchive(FSettings.Diretorio + lZipper.FileName);
+    if FSettings.SenhaDeArquivo <> '' then
+      lZipper.Password := FSettings.SenhaDeArquivo;
+
+    ArquivoTemporario := TPath.GetTempPath;
+    for var Item in FItemLista do
+    begin
+      ArquivoTemporario := ArquivoTemporario + ExtractFileName(Item.Caminho);
+      TFile.Copy(Item.Caminho, ArquivoTemporario, true);
+      lZipper.AddFiles((ArquivoTemporario), 0);
+      lZipper.Save;
+      TFile.Delete((ArquivoTemporario));
+    end;
+
+    lZipper.Save;
+    lZipper.CloseArchive;
+  finally
+    lZipper.Free;
+  end;
+end;
+
+procedure TRoutine.InserirNoBanco;
+begin
+  DMRoutine.TabRotina.Insert;
+
+  DMRoutine.TabRotina.FieldByName('Horario').AsDateTime := FHorario.GetTime;
+  DMRoutine.TabRotina.FieldByName('Total_Backup').AsInteger := FTotalBackups;
+  DMRoutine.TabRotina.FieldByName('CodigoConfiguracao').AsString :=
+    FSettings.Codigo;
+  DMRoutine.TabRotina.FieldByName('Descricao').AsString := FDescricao;
+  DMRoutine.TabRotina.FieldByName('Codigo').AsString := FCodigo;
+
+  DMRoutine.TabRotina.Post;
+  SalvarItens;
+end;
+
+function TRoutine.ListarItens: TList<iBackupItem>;
+begin
+  Result := FItemLista;
+end;
+
+class function TRoutine.ListarRotinas(APagina: Integer; Busca: string)
+  : TList<iRoutine>;
+begin
+  DMRoutine.sqlAuxRotina.Active := False;
+  DMRoutine.sqlAuxRotina.SQL.Clear;
+  DMRoutine.sqlAuxRotina.SQL.Add('SELECT R.* ');
+  DMRoutine.sqlAuxRotina.SQL.Add('FROM ROTINA R');
+
+  // Filtro...
+  if Busca <> '' then
+  begin
+    DMRoutine.sqlAuxRotina.SQL.Add('WHERE R.DESCRICAO LIKE :BUSCA ');
+    DMRoutine.sqlAuxRotina.ParamByName('BUSCA').Value := '%' + Busca + '%';
+  end;
+
+  DMRoutine.sqlAuxRotina.SQL.Add('ORDER BY DESCRICAO');
+  DMRoutine.sqlAuxRotina.SQL.Add('LIMIT :PAGINA, :QTD_REG');
+  DMRoutine.sqlAuxRotina.ParamByName('PAGINA').Value := (APagina - 1) * 15;
+  DMRoutine.sqlAuxRotina.ParamByName('QTD_REG').Value := 15;
+  DMRoutine.sqlAuxRotina.Active := true;
+
+  Result := TList<iRoutine>.Create;
+
+  DMRoutine.sqlAuxRotina.First;
+  while not DMRoutine.sqlAuxRotina.Eof do
+  begin
+    Result.Add(TRoutine.New.BuscarDados(DMRoutine.sqlAuxRotina.FieldByName
+      ('Codigo').AsString));
+    DMRoutine.sqlAuxRotina.Next;
+  end;
+end;
+
+class function TRoutine.ListarRotinas: TList<iRoutine>;
+begin
+  DMRoutine.TabRotina.Close;
+  DMRoutine.TabRotina.Open;
+
+  Result := TList<iRoutine>.Create;
+
+  DMRoutine.TabRotina.First;
+  while not DMRoutine.TabRotina.Eof do
+  begin
+    Result.Add(TRoutine.New.BuscarDados(DMRoutine.TabRotina.FieldByName
+      ('Codigo').AsString));
+    DMRoutine.TabRotina.Next;
+  end;
+
+end;
+
+function TRoutine.LocalizaCodigoEmZip(const Value: string): Boolean;
+begin
+  Result := Pos(FCodigo, Value) > 0;
+end;
+
+function TRoutine.Horario(Value: TDateTime): iRoutine;
+begin
+  FHorario := Value;
+  Result := Self;
+end;
+
+class function TRoutine.New: iRoutine;
+begin
+  Result := Self.Create;
+end;
+
+function TRoutine.RemoverItens(Value: iBackupItem): iRoutine;
+var
+  lIndex: Integer;
+begin
+  lIndex := FItemLista.IndexOf(Value);
+  if lIndex <> -1 then
+  begin
+    FItemLista.Delete(lIndex);
+    Value.Deletar;
+  end;
+  Result := Self;
+end;
+
+function TRoutine.Salvar: iRoutine;
+begin
+  // Se Localizar vai editar o registro, se não vai inserir
+  if not DMRoutine.TabRotina.Active then
+    DMRoutine.TabRotina.Open;
+  if DMRoutine.TabRotina.Locate('codigo', Self.FCodigo) then
+  begin
+    AtualizarNoBanco;
+  end
+  else
+  begin
+    InserirNoBanco;
+  end;
+end;
+
+function TRoutine.TotalBackupsSalvos(Value: Integer): iRoutine;
+begin
+  if Value <= 0 then
+    raise Exception.Create
+      ('O Número de acumulo de backups deve ser superior a zero');
+  FTotalBackups := Value;
+  Result := Self;
+end;
+
+function TRoutine.TotalBackupsSalvos: Integer;
+begin
+  Result := FTotalBackups;
+end;
+
+function TRoutine.VerificarNomeArquivo: string;
+var
+  BaseNome, NovoNome: string;
+  Contador: Integer;
+  Existe: Boolean;
+begin
+  BaseNome := FDescricao + ' - ' + FCodigo + ' - ' +
+    FormatDateTime('dd-mm-yy', Now);
+  Contador := 0;
+
+  repeat
+
+    Existe := False;
+    if Contador = 0 then
+      NovoNome := BaseNome + '.zip'
+    else
+      NovoNome := Format('%s - (%d).zip', [BaseNome, Contador]);
+    for var Item in TDirectory.GetFiles(FSettings.Diretorio, '*.zip') do
+    begin
+      if SameText(ExtractFileName(Item), NovoNome) then
+      begin
+        Existe := true;
+        Break;
+      end;
+    end;
+    if Existe then
+      Inc(Contador)
+    else
+      Break;
+
+  until False;
+
+  Result := NovoNome;
+end;
+
+function TRoutine.EncontrarBackupsValidos: TStringList;
+var
+  Arquivo: string;
+begin
+  Result := TStringList.Create;
+  for Arquivo in TDirectory.GetFiles(FSettings.Diretorio, '*.zip') do
+  begin
+    if LocalizaCodigoEmZip(Arquivo) then
+    begin
+      Result.Add(Arquivo);
+    end;
+  end;
+end;
+
+function TRoutine.RetornaDataMotificacao(FTP: TIdFTP; const FileName: string)
+  : TDateTime;
+begin
+  Result := FTP.FileDate(FileName);
+end;
+
+function TRoutine.EncontrarBackupsValidos(FTP: TIdFTP; const BaseDir: string)
+  : TStringList;
+var
+  I: Integer;
+begin
+  Result := TStringList.Create;
+  try
+    FTP.List(BaseDir, False);
+    for I := 0 to FTP.DirectoryListing.Count - 1 do
+    begin
+      with FTP.DirectoryListing[I] do
+      begin
+        if (ItemType = ditFile) and LocalizaCodigoEmZip(FileName) then
+        begin
+          Result.Add(FileName + ';' + DateTimeToStr(RetornaDataMotificacao(FTP,
+            FileName)));
+        end;
+      end;
+    end;
+  except
+    on E: Exception do
+    begin
+      Result.Free;
+      raise;
+    end;
+  end;
+end;
+
+function TRoutine.ExcluirArquivoMaisAntigo(FTP: TIdFTP;
+  ListaDetalhes: TStringList; const BaseDir: string): Boolean;
+var
+  I: Integer;
+  ArquivoMaisAntigo: string;
+  DataHoraMaisAntiga, DataHoraArquivo: TDateTime;
+  NomeArquivo, StrDataHoraArquivo: string;
+  ParsedLine: TStringList;
+begin
+  Result := False;
+  if ListaDetalhes.Count = 0 then
+    Exit;
+
+  DataHoraMaisAntiga := Now;
+
+  ParsedLine := TStringList.Create;
+  try
+    ParsedLine.Delimiter := ';';
+    ParsedLine.StrictDelimiter := true;
+
+    for I := 0 to ListaDetalhes.Count - 1 do
+    begin
+      ParsedLine.DelimitedText := ListaDetalhes[I];
+      if ParsedLine.Count >= 2 then
+      begin
+        NomeArquivo := ParsedLine[0];
+        StrDataHoraArquivo := ParsedLine[1];
+
+        if TryStrToDateTime(StrDataHoraArquivo, DataHoraArquivo) then
+        begin
+          if DataHoraArquivo < DataHoraMaisAntiga then
+          begin
+            DataHoraMaisAntiga := DataHoraArquivo;
+            ArquivoMaisAntigo := NomeArquivo;
+          end;
+        end;
+      end;
+    end;
+
+    if ArquivoMaisAntigo <> '' then
+    begin
+      try
+        FTP.Delete(ArquivoMaisAntigo);
+        Result := true;
+      except
+        on E: Exception do
+        begin
+          Result := False;
+        end;
+      end;
+    end;
+  finally
+    ParsedLine.Free;
+  end;
+end;
+
+function TRoutine.ExcluirArquivoMaisAntigo(ListaArquivos: TStringList): Boolean;
+var
+  ArquivoMaisAntigo: string;
+  IdadeArquivoMaisAntigo, IdadeArquivoAtual: Integer;
+  I: Integer;
+begin
+  Result := False;
+  if ListaArquivos.Count = 0 then
+    Exit;
+
+  ArquivoMaisAntigo := ListaArquivos[0];
+  IdadeArquivoMaisAntigo := FileAge(ArquivoMaisAntigo);
+
+  for I := 1 to ListaArquivos.Count - 1 do
+  begin
+    IdadeArquivoAtual := FileAge(ListaArquivos[I]);
+    if IdadeArquivoAtual < IdadeArquivoMaisAntigo then
+    begin
+      ArquivoMaisAntigo := ListaArquivos[I];
+      IdadeArquivoMaisAntigo := IdadeArquivoAtual;
+    end;
+  end;
+
+  Result := DeleteFile(ArquivoMaisAntigo);
+end;
+
+function TRoutine.VerificarNomeArquivo(FTP: TIdFTP;
+  const BaseDir: string): string;
+var
+  Contador: Integer;
+  NovoNome, NomeArquivoRemoto: string;
+  ListaArquivos: TStringList;
+begin
+  Contador := 0;
+  ListaArquivos := TStringList.Create;
+  try
+    FTP.List(ListaArquivos, BaseDir, False);
+
+    repeat
+      if Contador = 0 then
+        NovoNome := FDescricao + ' - ' + FCodigo + ' - ' +
+          FormatDateTime('dd-mm-yy', Now)
+      else
+        NovoNome := Format('%s - (%d)', [NovoNome, Contador]);
+
+      NomeArquivoRemoto := BaseDir + NovoNome;
+      if ListaArquivos.IndexOf(BaseDir + '/' + NovoNome + '.zip') > -1 then
+        Inc(Contador)
+      else
+        Break;
+
+    until False;
+  finally
+    ListaArquivos.Free;
+  end;
+  Result := NovoNome + '.zip';
+end;
+
+function TRoutine.VerificarUltimosBackups(FTP: TIdFTP; const BaseDir: string;
+  TotalBackups: Integer): Boolean;
+var
+  ListaBackupsValidos: TStringList;
+begin
+  ListaBackupsValidos := EncontrarBackupsValidos(FTP, BaseDir);
+  try
+    Result := ListaBackupsValidos.Count >= TotalBackups;
+    if Result then
+    begin
+      ExcluirArquivoMaisAntigo(FTP, ListaBackupsValidos, BaseDir);
+    end;
+  finally
+    ListaBackupsValidos.Free;
+  end;
+end;
+
+function TRoutine.VerificarUltimosBackups: Boolean;
+var
+  ListaBackupsValidos: TStringList;
+begin
+  ListaBackupsValidos := EncontrarBackupsValidos;
+  try
+    Result := ListaBackupsValidos.Count = FTotalBackups;
+    if Result then
+    begin
+      ExcluirArquivoMaisAntigo(ListaBackupsValidos);
+    end;
+  finally
+    ListaBackupsValidos.Free;
+  end;
+end;
+
+end.

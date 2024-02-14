@@ -19,6 +19,7 @@ type
     function CodigoInterno: integer;
     function BuscarDados(CodigoItem: string): iBackupItem;
     function Salvar: iBackupItem;
+    procedure Deletar;
   end;
 
   TTipoConfigStorage = (FTP, Local);
@@ -53,7 +54,6 @@ type
     function TotalBackupsSalvos(Value: integer): iRoutine; overload;
     function TotalBackupsSalvos: integer; overload;
     function AdicionarItem(Value: iBackupItem): iRoutine;
-    function RemoverItem(Value: iBackupItem): iRoutine;
     function ListarItens: TList<iBackupItem>;
     function Configuracao(Value: iStorageSettings): iRoutine; overload;
     function Configuracao: iStorageSettings; overload;
@@ -62,6 +62,8 @@ type
     function BuscarDados(aCodigo: string): iRoutine;
     function IniciarBackup: iRoutine;
     function Salvar: iRoutine;
+    function RemoverItens: iRoutine;
+    procedure Deletar;
   end;
 
   iSettings = interface

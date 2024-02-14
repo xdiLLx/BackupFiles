@@ -169,8 +169,8 @@ begin
     ('Porta').AsInteger;
   FCodigo := dmStorageSettings.TabConfiguracaoArmazenamentoFiltrada.FieldByName
     ('Codigo').AsString;
-  FSenhaDeArquivo := dmStorageSettings.TabConfiguracaoArmazenamentoFiltrada.FieldByName
-    ('SenhaArquivo').AsString;
+  FSenhaDeArquivo := dmStorageSettings.TabConfiguracaoArmazenamentoFiltrada.
+    FieldByName('SenhaArquivo').AsString;
 
   if dmStorageSettings.TabConfiguracaoArmazenamentoFiltrada.FieldByName
     ('TipoConfiguracao').AsString = 'FTP' then
@@ -228,10 +228,10 @@ end;
 
 function TStorageSettings.Porta(Value: integer): iStorageSettings;
 begin
-  if FTipoConfiguracao = Local then
-    raise Exception.Create
-      ('A Porta só é inserida caso a configuração seja FTP');
-  FPorta := Value;
+  if FTipoConfiguracao = FTP then
+  begin
+    FPorta := Value;
+  end;
   Result := Self;
 end;
 
@@ -242,10 +242,12 @@ end;
 
 function TStorageSettings.Senha(Value: string): iStorageSettings;
 begin
-  if FTipoConfiguracao = Local then
-    raise Exception.Create
-      ('A Senha só é inserida caso a configuração seja FTP');
-  FSenha := Value;
+  if FTipoConfiguracao = FTP then
+  begin
+    if Value = '' then
+      raise Exception.Create('A senha para o servidor não pode ser vazia');
+    FSenha := Value;
+  end;
   Result := Self;
 end;
 
@@ -302,23 +304,26 @@ end;
 
 function TStorageSettings.Servidor(Value: string): iStorageSettings;
 begin
-  if Value = '' then
-    raise Exception.Create('Hostname/IP do servidor não poder ficar em branco');
-  if FTipoConfiguracao = Local then
-    raise Exception.Create
-      ('O Servidor só é inserido caso a configuração seja FTP');
-  FServidor := Value;
+
+  if FTipoConfiguracao = FTP then
+  begin
+    if Value = '' then
+      raise Exception.Create
+        ('Hostname/IP do servidor não poder ficar em branco');
+    FServidor := Value;
+  end;
   Result := Self;
 end;
 
 function TStorageSettings.Usuario(Value: string): iStorageSettings;
 begin
-  if Value = '' then
-    raise Exception.Create('Usuario do servidor não poder ficar em branco');
-  if FTipoConfiguracao = Local then
-    raise Exception.Create
-      ('O Usuario só é inserido caso a configuração seja FTP');
-  FUsuario := Value;
+  if FTipoConfiguracao = FTP then
+  begin
+    if Value = '' then
+      raise Exception.Create('Usuario do servidor não poder ficar em branco');
+
+    FUsuario := Value;
+  end;
   Result := Self;
 end;
 

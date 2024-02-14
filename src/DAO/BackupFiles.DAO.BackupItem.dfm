@@ -60,4 +60,9 @@ object dmBackupItem: TdmBackupItem
         Value = Null
       end>
   end
+  object sqlAuxBackupItem: TFDQuery
+    Connection = DM.database
+    Left = 56
+    Top = 392
+  end
 end

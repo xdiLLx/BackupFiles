@@ -1,0 +1,63 @@
+object dmBackupItem: TdmBackupItem
+  OnCreate = DataModuleCreate
+  Height = 480
+  Width = 640
+  object TabItemBackup: TFDQuery
+    Connection = DM.database
+    SQL.Strings = (
+      'select * from itembackup r')
+    Left = 32
+    Top = 16
+    object TabItemBackupID: TIntegerField
+      AutoGenerateValue = arAutoInc
+      FieldName = 'ID'
+      Origin = 'ID'
+      ProviderFlags = [pfInUpdate, pfInWhere, pfInKey]
+      Required = True
+    end
+    object TabItemBackupNome: TWideStringField
+      FieldName = 'Nome'
+      Origin = 'Nome'
+      Size = 50
+    end
+    object TabItemBackupCaminho: TWideStringField
+      FieldName = 'Caminho'
+      Origin = 'Caminho'
+      Required = True
+      Size = 150
+    end
+    object TabItemBackupUltimaModificacao: TDateTimeField
+      FieldName = 'UltimaModificacao'
+      Origin = 'UltimaModificacao'
+    end
+    object TabItemBackupCodigoRotina: TWideStringField
+      FieldName = 'CodigoRotina'
+      Origin = 'CodigoRotina'
+      Required = True
+      Size = 25
+    end
+    object TabItemBackupTamanho: TLargeintField
+      FieldName = 'Tamanho'
+      Origin = 'Tamanho'
+    end
+    object TabItemBackupCodigo: TWideStringField
+      FieldName = 'Codigo'
+      Origin = 'Codigo'
+      Required = True
+      Size = 25
+    end
+  end
+  object TabItemBackupFiltrada: TFDQuery
+    Connection = DM.database
+    SQL.Strings = (
+      'select * from itembackup r where r.codigo = :codigo')
+    Left = 136
+    Top = 16
+    ParamData = <
+      item
+        Name = 'CODIGO'
+        ParamType = ptInput
+        Value = Null
+      end>
+  end
+end

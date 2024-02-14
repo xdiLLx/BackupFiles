@@ -529,10 +529,12 @@ object FormMenuPrincipal: TFormMenuPrincipal
       Size.Width = 1287.000000000000000000
       Size.Height = 768.000000000000000000
       Size.PlatformDefault = False
-      TabIndex = 0
+      TabIndex = 1
       TabOrder = 0
       TabPosition = None
       Sizes = (
+        1287s
+        768s
         1287s
         768s
         1287s
@@ -541,7 +543,7 @@ object FormMenuPrincipal: TFormMenuPrincipal
         CustomIcon = <
           item
           end>
-        IsSelected = True
+        IsSelected = False
         Size.Width = 8.000000000000000000
         Size.Height = 8.000000000000000000
         Size.PlatformDefault = False
@@ -563,7 +565,7 @@ object FormMenuPrincipal: TFormMenuPrincipal
             Size.Height = 703.000000000000000000
             Size.PlatformDefault = False
             StyleLookup = 'TabControlRotinasStyle1'
-            TabIndex = 1
+            TabIndex = 0
             TabOrder = 0
             TabPosition = None
             Sizes = (
@@ -575,7 +577,7 @@ object FormMenuPrincipal: TFormMenuPrincipal
               CustomIcon = <
                 item
                 end>
-              IsSelected = False
+              IsSelected = True
               Size.Width = 8.000000000000000000
               Size.Height = 8.000000000000000000
               Size.PlatformDefault = False
@@ -866,6 +868,7 @@ object FormMenuPrincipal: TFormMenuPrincipal
                     YRadius = 10.000000000000000000
                     ParentShowHint = False
                     ShowHint = False
+                    OnClick = btnBuscarDiretorioClick
                     ColorSettings.Color = xFF4F67AA
                     ColorSettings.StrokeColor = claBlack
                     ColorSettings.ActiveColor = xFF3D5085
@@ -1088,7 +1091,7 @@ object FormMenuPrincipal: TFormMenuPrincipal
               CustomIcon = <
                 item
                 end>
-              IsSelected = True
+              IsSelected = False
               Size.Width = 8.000000000000000000
               Size.Height = 8.000000000000000000
               Size.PlatformDefault = False
@@ -1313,7 +1316,7 @@ object FormMenuPrincipal: TFormMenuPrincipal
               TextSettings.Font.Size = 17.000000000000000000
               TextSettings.Font.StyleExt = {00070000000000000004000000}
               TextSettings.VertAlign = Trailing
-              Text = 'Nome do Projeto'
+              Text = 'Nova Rotina'
               TabOrder = 4
             end
             object lblDescricao: TLabel
@@ -1540,8 +1543,6 @@ object FormMenuPrincipal: TFormMenuPrincipal
           Size.Width = 1007.000000000000000000
           Size.Height = 65.000000000000000000
           Size.PlatformDefault = False
-          XRadius = 20.000000000000000000
-          YRadius = 20.000000000000000000
           OnMouseDown = rectTopoMouseDown
           OnResized = rectTopoResized
           object btnMinimizar: TGDCornerButton
@@ -1640,7 +1641,7 @@ object FormMenuPrincipal: TFormMenuPrincipal
         CustomIcon = <
           item
           end>
-        IsSelected = False
+        IsSelected = True
         Margins.Left = 1.000000000000000000
         Margins.Right = 1.000000000000000000
         Size.Width = 8.000000000000000000
@@ -1748,7 +1749,7 @@ object FormMenuPrincipal: TFormMenuPrincipal
             TextSettings.Font.Size = 15.000000000000000000
             TextSettings.Font.StyleExt = {00070000000000000004000000}
             TextSettings.FontColor = xFFB1AFAF
-            Text = 'Rotinas  /  Banco de Dados  /  Configura'#231#245'es de Projeto'
+            Text = 'Lista de Rotinas'
             TabOrder = 4
           end
         end
@@ -1865,6 +1866,7 @@ object FormMenuPrincipal: TFormMenuPrincipal
                 Size.PlatformDefault = False
                 TextPrompt = 'Pesquise suas rotinas'
                 StyledSettings = [Style, FontColor]
+                OnTyping = edtPesquisaTyping
               end
               object lblPesquisa: TLabel
                 Align = Right
@@ -2050,6 +2052,119 @@ object FormMenuPrincipal: TFormMenuPrincipal
               SelectionCrossfade = True
               ControlType = Platform
             end
+          end
+        end
+      end
+      object tabConfiguracao: TTabItem
+        CustomIcon = <
+          item
+          end>
+        IsSelected = False
+        Size.Width = 8.000000000000000000
+        Size.Height = 8.000000000000000000
+        Size.PlatformDefault = False
+        StyleLookup = ''
+        TabOrder = 0
+        Text = 'Configura'#231#245'es da Aplica'#231#227'o'
+        object rectTopoConfig: TRectangle
+          Align = Top
+          Corners = [TopRight]
+          Fill.Color = claWhite
+          Sides = [Top, Right]
+          Size.Width = 1287.000000000000000000
+          Size.Height = 65.000000000000000000
+          Size.PlatformDefault = False
+          OnMouseDown = rectTopoMouseDown
+          OnResized = rectTopoResized
+          object btnMinimizarConfig: TGDCornerButton
+            Align = Right
+            StyledSettings = [FontColor]
+            Margins.Top = 10.000000000000000000
+            Margins.Bottom = 10.000000000000000000
+            Position.X = 1127.000000000000000000
+            Position.Y = 10.000000000000000000
+            Sides = [Top, Left, Bottom, Right]
+            Size.Width = 50.000000000000000000
+            Size.Height = 45.000000000000000000
+            Size.PlatformDefault = False
+            TabOrder = 3
+            Text = #61544
+            TextSettings.Font.Family = 'Font Awesome 6 Free Solid'
+            TextSettings.Font.Size = 20.000000000000000000
+            TextSettings.Font.StyleExt = {00090000000000000004000000}
+            XRadius = 25.000000000000000000
+            YRadius = 25.000000000000000000
+            ColorSettings.Color = claWhite
+            ColorSettings.StrokeColor = claBlack
+            ColorSettings.ActiveColor = xFFEFECEC
+            ColorSettings.UseActiveColor = True
+            ColorSettings.ActiveFontColor = claBlack
+            SystemClick = Minimize
+          end
+          object btnExpandirConfig: TGDCornerButton
+            Align = Right
+            StyledSettings = [FontColor]
+            Margins.Top = 10.000000000000000000
+            Margins.Bottom = 10.000000000000000000
+            Position.X = 1177.000000000000000000
+            Position.Y = 10.000000000000000000
+            Sides = [Top, Left, Bottom, Right]
+            Size.Width = 50.000000000000000000
+            Size.Height = 45.000000000000000000
+            Size.PlatformDefault = False
+            TabOrder = 2
+            Text = #61640
+            TextSettings.Font.Family = 'Font Awesome 6 Free'
+            TextSettings.Font.Size = 20.000000000000000000
+            XRadius = 25.000000000000000000
+            YRadius = 25.000000000000000000
+            ColorSettings.Color = claWhite
+            ColorSettings.StrokeColor = claBlack
+            ColorSettings.ActiveColor = xFFEFECEC
+            ColorSettings.UseActiveColor = True
+            ColorSettings.ActiveFontColor = claBlack
+            SystemClick = Expand
+          end
+          object btnFecharConfig: TGDCornerButton
+            Align = Right
+            StyledSettings = []
+            Margins.Top = 10.000000000000000000
+            Margins.Right = 10.000000000000000000
+            Margins.Bottom = 10.000000000000000000
+            Position.X = 1227.000000000000000000
+            Position.Y = 10.000000000000000000
+            Sides = [Top, Left, Bottom, Right]
+            Size.Width = 50.000000000000000000
+            Size.Height = 45.000000000000000000
+            Size.PlatformDefault = False
+            TabOrder = 1
+            Text = #61453
+            TextSettings.Font.Family = 'Font Awesome 6 Free Solid'
+            TextSettings.Font.Size = 20.000000000000000000
+            TextSettings.Font.StyleExt = {00090000000000000004000000}
+            XRadius = 25.000000000000000000
+            YRadius = 25.000000000000000000
+            ColorSettings.Color = claWhite
+            ColorSettings.StrokeColor = claBlack
+            ColorSettings.ActiveColor = claRed
+            ColorSettings.UseActiveColor = True
+            ColorSettings.ActiveFontColor = claWhite
+            SystemClick = Close
+          end
+          object lblCaminhoConfig: TLabel
+            Align = Left
+            StyledSettings = []
+            Margins.Left = 30.000000000000000000
+            Position.X = 30.000000000000000000
+            Size.Width = 417.000000000000000000
+            Size.Height = 65.000000000000000000
+            Size.PlatformDefault = False
+            TextSettings.Font.Family = 'Roboto'
+            TextSettings.Font.Size = 15.000000000000000000
+            TextSettings.Font.StyleExt = {00070000000000000004000000}
+            TextSettings.FontColor = xFFB1AFAF
+            Text = 'Configura'#231#245'es da Aplica'#231#227'o'
+            TabOrder = 4
           end
         end
       end
@@ -4834,5 +4949,11 @@ object FormMenuPrincipal: TFormMenuPrincipal
   object OpenDialogAdicionarItem: TOpenDialog
     Left = 975
     Top = 358
+  end
+  object TimerPesquisa: TTimer
+    Interval = 500
+    OnTimer = TimerPesquisaTimer
+    Left = 719
+    Top = 141
   end
 end

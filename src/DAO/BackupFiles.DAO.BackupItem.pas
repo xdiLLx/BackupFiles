@@ -19,6 +19,7 @@ type
     TabItemBackupCodigoRotina: TWideStringField;
     TabItemBackupTamanho: TLargeintField;
     TabItemBackupCodigo: TWideStringField;
+    sqlAuxBackupItem: TFDQuery;
     procedure DataModuleCreate(Sender: TObject);
   private
     procedure VerificaCamposBanco;

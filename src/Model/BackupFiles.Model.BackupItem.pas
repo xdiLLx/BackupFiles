@@ -194,9 +194,9 @@ end;
 procedure TBackupItem.Deletar;
 begin
   dmBackupItem.sqlAuxBackupItem.Close;
-  dmBackupItem.sqlAuxBackupItem.SQL.Text :=
-    'DELETE FROM ITEMBACKUP R WHERE R.CODIGO = :COD';
-  dmBackupItem.sqlAuxBackupItem.FieldByName('COD').AsString := Self.FCodigo;
+  dmBackupItem.sqlAuxBackupItem.SQL.Clear;
+  dmBackupItem.sqlAuxBackupItem.SQL.Add('DELETE FROM ITEMBACKUP WHERE CODIGO = :COD');
+  dmBackupItem.sqlAuxBackupItem.ParamByName('COD').AsString := Self.FCodigo;
   dmBackupItem.sqlAuxBackupItem.ExecSQL;
 end;
 

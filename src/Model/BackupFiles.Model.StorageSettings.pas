@@ -40,6 +40,7 @@ type
     function TipoConfiguracao: TTipoConfigStorage; overload;
     function BuscarDados(aCodigo: string): iStorageSettings;
     function Salvar: iStorageSettings;
+    procedure Deletar;
   public
     constructor Create(TipoConfiguracao: TTipoConfigStorage); overload;
     constructor Create; overload;
@@ -55,6 +56,15 @@ uses
   System.SysUtils;
 
 { TStorageSettings }
+
+procedure TStorageSettings.Deletar;
+begin
+  dmStorageSettings.sqlAuxStorageSettings.Close;
+  dmStorageSettings.sqlAuxStorageSettings.SQL.Clear;
+  dmStorageSettings.sqlAuxStorageSettings.SQL.Add('DELETE FROM CONFIGURACAO_ARMAZENAMENTO WHERE CODIGO = :COD');
+  dmStorageSettings.sqlAuxStorageSettings.ParamByName('COD').AsString := Self.FCodigo;
+  dmStorageSettings.sqlAuxStorageSettings.ExecSQL;
+end;
 
 function TStorageSettings.GenerateUniqueCode: string;
 var
@@ -101,7 +111,7 @@ begin
     .AsInteger := FPorta;
   dmStorageSettings.TabConfiguracaoArmazenamentoFiltrada.FieldByName('Codigo')
     .AsString := FCodigo;
-  dmStorageSettings.TabConfiguracaoArmazenamento.FieldByName('SenhaArquivo')
+  dmStorageSettings.TabConfiguracaoArmazenamentoFiltrada.FieldByName('SenhaArquivo')
     .AsString := FSenhaDeArquivo;
   if FTipoConfiguracao = FTP then
     dmStorageSettings.TabConfiguracaoArmazenamentoFiltrada.FieldByName

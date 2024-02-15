@@ -23,6 +23,7 @@ type
   TdmStorageSettings = class(TDataModule)
     TabConfiguracaoArmazenamento: TFDQuery;
     TabConfiguracaoArmazenamentoFiltrada: TFDQuery;
+    sqlAuxStorageSettings: TFDQuery;
     procedure DataModuleCreate(Sender: TObject);
   private
     { Private declarations }

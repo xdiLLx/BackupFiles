@@ -24,4 +24,9 @@ object dmStorageSettings: TdmStorageSettings
         Value = Null
       end>
   end
+  object sqlAuxStorageSettings: TFDQuery
+    Connection = DM.database
+    Left = 88
+    Top = 400
+  end
 end

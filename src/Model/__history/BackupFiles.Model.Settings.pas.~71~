@@ -1,0 +1,203 @@
+unit BackupFiles.Model.Settings;
+
+interface
+
+uses
+  BackupFiles.Model.Interfaces,
+  System.SysUtils,
+  System.DateUtils,
+  BackupFiles.DAO.Settings,
+  System.Win.Registry, Winapi.Windows;
+
+type
+  TSettings = class(TInterfacedObject, iSettings)
+  strict private
+    function GenerateUniqueCode: string;
+    procedure BuscarDados;
+    function AtualizarNoBanco: string;
+    function InserirNoBanco: string;
+    procedure AdicionarAoInicializar;
+    procedure RemoverDoInicializar;
+  private
+    { Campos privados }
+    FIniciarComWindows: Boolean;
+    FCodigo: string;
+    function IniciarComWindows(Value: Boolean): iSettings; overload;
+    function IniciarComWindows: Boolean; overload;
+    function Codigo: string;
+    function Salvar: iSettings;
+    procedure AplicaMudancasConfiguracao;
+  public
+    constructor Create;
+    destructor Destroy; override;
+    class function New: iSettings;
+  end;
+
+implementation
+
+{ TSettings }
+
+procedure TSettings.RemoverDoInicializar;
+var
+  Registry: TRegistry;
+begin
+  Registry := TRegistry.Create(KEY_WRITE OR KEY_WOW64_64KEY);
+  try
+    Registry.RootKey := HKEY_CURRENT_USER;
+    if Registry.OpenKey('\Software\Microsoft\Windows\CurrentVersion\Run', True)
+    then
+    begin
+      if Registry.ValueExists('GD BackupFiles') then
+        Registry.DeleteValue('GD BackupFiles');
+      Registry.CloseKey;
+    end;
+  finally
+    Registry.Free;
+  end;
+end;
+
+procedure TSettings.AdicionarAoInicializar;
+var
+  Registry: TRegistry;
+begin
+  Registry := TRegistry.Create(KEY_WRITE OR KEY_WOW64_64KEY);
+  try
+    Registry.RootKey := HKEY_CURRENT_USER;
+    if Registry.OpenKey('\Software\Microsoft\Windows\CurrentVersion\Run', True)
+    then
+    begin
+      Registry.WriteString('GD BackupFiles', ExtractFilePath(ParamStr(0)) +
+        'BackupFiles.exe');
+      Registry.CloseKey;
+    end;
+  finally
+    Registry.Free;
+  end;
+end;
+
+function TSettings.GenerateUniqueCode: string;
+var
+  GUID: TGUID;
+  Timestamp: Int64;
+  RandomPart: string;
+begin
+  // Gera um GUID
+  CreateGUID(GUID);
+  // Converte o GUID em string e remove os caracteres não numéricos
+  Result := GUIDToString(GUID).Replace('{', '').Replace('}', '')
+    .Replace('-', '');
+  // Pega apenas os primeiros 18 caracteres para deixar espaço para o resto
+  Result := Copy(Result, 1, 18);
+  // Gera um timestamp
+  Timestamp := DateTimeToUnix(Now, False);
+  // Converte o timestamp para string e pega os últimos 7 dígitos
+  RandomPart := IntToStr(Timestamp mod 10000000);
+  // Assegura que a parte aleatória tenha 7 caracteres, preenchendo com '0' se necessário
+  while Length(RandomPart) < 7 do
+    RandomPart := '0' + RandomPart;
+  // Combina as partes para formar um código único de 25 caracteres
+  Result := Copy(Result + RandomPart, 1, 25);
+end;
+
+procedure TSettings.BuscarDados;
+begin
+  dmSettings.TabConfiguracao.Close;
+  dmSettings.TabConfiguracao.Open;
+
+  FIniciarComWindows := dmSettings.TabConfiguracao.FieldByName
+    ('IniciarComWindows').AsBoolean;
+  FCodigo := dmSettings.TabConfiguracao.FieldByName('Codigo').AsString;
+end;
+
+function TSettings.Codigo: string;
+begin
+  Result := FCodigo;
+end;
+
+constructor TSettings.Create;
+begin
+  FCodigo := GenerateUniqueCode;
+  FIniciarComWindows := True;
+
+  dmSettings.TabConfiguracao.Close;
+  dmSettings.TabConfiguracao.Open;
+
+  if dmSettings.TabConfiguracao.RecordCount > 0 then
+    BuscarDados
+  else
+    InserirNoBanco;
+end;
+
+destructor TSettings.Destroy;
+begin
+
+  inherited;
+end;
+
+function TSettings.IniciarComWindows: Boolean;
+begin
+  Result := FIniciarComWindows;
+end;
+
+function TSettings.IniciarComWindows(Value: Boolean): iSettings;
+begin
+  Result := Self;
+  FIniciarComWindows := Value;
+end;
+
+class function TSettings.New: iSettings;
+begin
+  Result := Self.Create;
+end;
+
+function TSettings.Salvar: iSettings;
+begin
+  if not dmSettings.TabConfiguracao.Active then
+    dmSettings.TabConfiguracao.Open;
+  if dmSettings.TabConfiguracao.Locate('codigo', Self.FCodigo) then
+  begin
+    AtualizarNoBanco;
+  end
+  else
+  begin
+    InserirNoBanco;
+  end;
+end;
+
+function TSettings.AtualizarNoBanco: string;
+begin
+  dmSettings.TabConfiguracao.Close;
+  dmSettings.TabConfiguracao.Open;
+
+  dmSettings.TabConfiguracao.Edit;
+  dmSettings.TabConfiguracao.FieldByName('IniciarComWindows').AsBoolean :=
+    FIniciarComWindows;
+  dmSettings.TabConfiguracao.FieldByName('Codigo').AsString := FCodigo;
+
+  dmSettings.TabConfiguracao.Post;
+  AplicaMudancasConfiguracao;
+end;
+
+function TSettings.InserirNoBanco: string;
+begin
+  dmSettings.TabConfiguracao.Close;
+  dmSettings.TabConfiguracao.Open;
+
+  dmSettings.TabConfiguracao.Insert;
+  dmSettings.TabConfiguracao.FieldByName('IniciarComWindows').AsBoolean :=
+    FIniciarComWindows;
+  dmSettings.TabConfiguracao.FieldByName('Codigo').AsString := FCodigo;
+
+  dmSettings.TabConfiguracao.Post;
+  AplicaMudancasConfiguracao;
+end;
+
+procedure TSettings.AplicaMudancasConfiguracao;
+begin
+  if FIniciarComWindows then
+    AdicionarAoInicializar
+  else
+    RemoverDoInicializar;
+end;
+
+end.

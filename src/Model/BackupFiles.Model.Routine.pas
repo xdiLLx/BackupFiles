@@ -249,10 +249,12 @@ end;
 procedure TRoutine.Deletar;
 begin
   DMRoutine.sqlAuxRotina.Close;
-  DMRoutine.sqlAuxRotina.SQL.Text :=
-    'DELETE FROM ROTINA R WHERE R.CODIGO = :COD';
-  DMRoutine.sqlAuxRotina.FieldByName('COD').AsString := Self.FCodigo;
+  DMRoutine.sqlAuxRotina.SQL.Clear;
+  DMRoutine.sqlAuxRotina.SQL.Add('DELETE FROM ROTINA WHERE CODIGO = :COD');
+  DMRoutine.sqlAuxRotina.ParamByName('COD').AsString := Self.FCodigo;
   DMRoutine.sqlAuxRotina.ExecSQL;
+  RemoverItens;
+  FSettings.Deletar;
 end;
 
 function TRoutine.Descricao(Value: string): iRoutine;
@@ -340,7 +342,7 @@ begin
     VerificarUltimosBackups;
     lZipper.StoreOptions := [soStripDrive, soStripPath];
     lZipper.FileName := VerificarNomeArquivo;
-    lZipper.OpenArchive(FSettings.Diretorio + lZipper.FileName);
+    lZipper.OpenArchive(FSettings.Diretorio +'\'+ lZipper.FileName);
     if FSettings.SenhaDeArquivo <> '' then
       lZipper.Password := FSettings.SenhaDeArquivo;
 
@@ -454,6 +456,7 @@ begin
   begin
     Item.Deletar;
   end;
+  FItemLista.Clear;
   Result := Self;
 end;
 

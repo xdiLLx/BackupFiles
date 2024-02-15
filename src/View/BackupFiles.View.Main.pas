@@ -1,4 +1,4 @@
-unit BackupFiles.View.Main;
+﻿unit BackupFiles.View.Main;
 
 interface
 
@@ -10,7 +10,8 @@ uses
   FMX.TabControl, FMX.Edit, FMX.DateTimeCtrls, FMX.Effects, FMX.ListBox,
   FMX.Layouts, FMX.ListView.Types, FMX.ListView.Appearances,
   FMX.ListView.Adapters.Base, FMX.ListView, BackupFiles.Controller.BackupItem,
-  BackupFiles.Controller.StorageSettings, BackupFiles.Model.Interfaces;
+  BackupFiles.Controller.StorageSettings, BackupFiles.Model.Interfaces,
+  BackupFiles.Controller.Settings;
 
 type
   TFormMenuPrincipal = class(TForm)
@@ -124,6 +125,14 @@ type
     btnFecharConfig: TGDCornerButton;
     lblCaminhoConfig: TLabel;
     TimerPesquisa: TTimer;
+    rectGeralConfiguracao: TRectangle;
+    ShadowEffect5: TShadowEffect;
+    lblTituloConfig: TLabel;
+    lblIniciarComWindows: TLabel;
+    rectCheckBoxIniciarWindows: TRectangle;
+    lblInfoIniciarComWindows: TLabel;
+    lblIconCheck: TLabel;
+    Label8: TLabel;
     procedure rectTopoMouseDown(Sender: TObject; Button: TMouseButton;
       Shift: TShiftState; X, Y: Single);
     procedure rectTopoResized(Sender: TObject);
@@ -146,6 +155,28 @@ type
     procedure btnBuscarDiretorioClick(Sender: TObject);
     procedure TimerPesquisaTimer(Sender: TObject);
     procedure edtPesquisaTyping(Sender: TObject);
+    procedure edtDescricaoRotinaEnter(Sender: TObject);
+    procedure edtDescricaoRotinaExit(Sender: TObject);
+    procedure edtDescricaoRotinaKeyDown(Sender: TObject; var Key: Word;
+      var KeyChar: Char; Shift: TShiftState);
+    procedure edtLimiteBackupsKeyDown(Sender: TObject; var Key: Word;
+      var KeyChar: Char; Shift: TShiftState);
+    procedure tedtHorarioKeyDown(Sender: TObject; var Key: Word;
+      var KeyChar: Char; Shift: TShiftState);
+    procedure edtDiretorioKeyDown(Sender: TObject; var Key: Word;
+      var KeyChar: Char; Shift: TShiftState);
+    procedure edtSenhaArquivoKeyDown(Sender: TObject; var Key: Word;
+      var KeyChar: Char; Shift: TShiftState);
+    procedure edtServidorKeyDown(Sender: TObject; var Key: Word;
+      var KeyChar: Char; Shift: TShiftState);
+    procedure edtUsuarioKeyDown(Sender: TObject; var Key: Word;
+      var KeyChar: Char; Shift: TShiftState);
+    procedure edtSenhaServidorKeyDown(Sender: TObject; var Key: Word;
+      var KeyChar: Char; Shift: TShiftState);
+    procedure edtLimiteBackupsTyping(Sender: TObject);
+    procedure ListView1ItemClickEx(const Sender: TObject; ItemIndex: Integer;
+      const LocalClickPos: TPointF; const ItemObject: TListItemDrawable);
+    procedure rectCheckBoxIniciarWindowsClick(Sender: TObject);
   private
     FCriando: Boolean;
     FCodigoRotina: string;
@@ -155,6 +186,11 @@ type
     procedure LimparCampos;
     procedure GravarDados;
     procedure Pesquisar;
+    procedure AlterarRotina;
+    procedure HabilitarFoco(Sender: TObject; const aAtivar: Boolean = True);
+    procedure Focar(aControle: TFMXObject);
+    procedure ValidarNumero(Sender: TObject);
+    procedure CarregaConfiguracao;
     { Private declarations }
   public
     { Public declarations }
@@ -186,7 +222,7 @@ begin
       lbItens.ListItems[lbItens.Count - 1].StyleLookup := 'ListBoxItem2Style1';
     end
     else
-      ShowMessage('Este arquivo j� foi adicionado.');
+      ShowMessage('Este arquivo já foi adicionado.');
   end;
 end;
 
@@ -207,7 +243,13 @@ end;
 
 procedure TFormMenuPrincipal.btnConfigClick(Sender: TObject);
 begin
-  MudaPagina(tabConfiguracao);
+  if tabControlGeral.ActiveTab = tbVisualizaRotina then
+  begin
+    btnCancelarClick(btnCancelar);
+    MudaPagina(tabConfiguracao);
+  end
+  else
+    MudaPagina(tabConfiguracao);
 end;
 
 procedure TFormMenuPrincipal.btnConfiguracaoProjetoClick(Sender: TObject);
@@ -225,18 +267,21 @@ begin
 end;
 
 procedure TFormMenuPrincipal.LimparCampos;
-  procedure Limpar(aControle: TFmxObject);
+  procedure Limpar(aControle: TFMXObject);
   var
-    Child: TFmxObject;
+    Child: TFMXObject;
     I: Integer;
   begin
-    // Verifica se o componente atual � um TEdit ou TTimeEdit e limpa conforme o caso
+    // Verifica se o componente atual é um TEdit ou TTimeEdit e limpa conforme o caso
     if aControle is TEdit then
       TEdit(aControle).Text := ''
     else if aControle is TTimeEdit then
       TTimeEdit(aControle).Time := StrToTime('00:00')
-    else if aControle is TListBox then
-      TListBox(aControle).Clear;
+    else if aControle is TComboBox then
+    begin
+      TComboBox(aControle).ItemIndex := 0;
+      TComboBox(aControle).Enabled := True;
+    end;
 
     // Itera por todos os filhos do componente atual
     for I := 0 to aControle.ChildrenCount - 1 do
@@ -250,6 +295,9 @@ begin
   Limpar(rectBaseConfigRotina);
   Limpar(rectBaseStorage);
   Limpar(rectBaseItens);
+  FCodigoRotina := '';
+  lbItens.Clear;
+  lblNomeProjeto.Text:= 'Nova Rotina'
 end;
 
 procedure TFormMenuPrincipal.btnExcluirRotinaClick(Sender: TObject);
@@ -344,7 +392,19 @@ begin
   MudaPagina(tabListaRotinas);
   TControllerRoutine.New.ListarRotinas(ListView1, ListView1.Tag,
     edtPesquisa.Text, True);
+  CarregaConfiguracao;
 end;
+
+procedure TFormMenuPrincipal.CarregaConfiguracao;
+begin
+  if TControllerSettings.New.Item.IniciarComWindows then
+  begin
+    lblIconCheck.Text:='';
+    lblIconCheck.Font.Family:= 'Font Awesome 6 Free Solid';
+   // TControllerSettings.New.Item.IniciarComWindows(True).Salvar;
+  end;
+end;
+
 
 procedure TFormMenuPrincipal.FTPSelecionado(aValue: Boolean);
 begin
@@ -374,6 +434,92 @@ end;
 procedure TFormMenuPrincipal.ListView1Exit(Sender: TObject);
 begin
   ListView1.ItemIndex := -1;
+end;
+
+procedure TFormMenuPrincipal.ListView1ItemClickEx(const Sender: TObject;
+  ItemIndex: Integer; const LocalClickPos: TPointF;
+  const ItemObject: TListItemDrawable);
+begin
+  if ItemObject.Name = 'IconExcluir' then
+  begin
+    TControllerRoutine.New.Item.BuscarDados(ItemObject.TagString).Deletar;
+    ListView1.Items.Delete(ItemIndex);
+  end
+  else if ItemObject.Name = 'IconPlay' then
+  begin
+    TControllerRoutine.New.Item.BuscarDados(ItemObject.TagString).IniciarBackup;
+  end
+  else
+  begin
+    FCodigoRotina := ItemObject.TagString;
+    AlterarRotina;
+    MudaPagina(tbVisualizaRotina);
+    MudaPagina(tbItemConfigRotina);
+  end;
+end;
+
+procedure TFormMenuPrincipal.AlterarRotina;
+var
+  lRotina: iRoutine;
+  lConfig: iStorageSettings;
+begin
+  // Completa os Campos de Rotina
+
+  lRotina := TControllerRoutine.New.Item.BuscarDados(FCodigoRotina);
+  lblNomeProjeto.Text := lRotina.Descricao;
+  edtDescricaoRotina.Text := lRotina.Descricao;
+  edtLimiteBackups.Text := lRotina.TotalBackupsSalvos.ToString;
+  tedtHorario.Time := lRotina.Horario;
+
+  // Completa os Itens
+  for var Item in lRotina.ListarItens do
+  begin
+    lbItens.Items.Add(Item.Caminho);
+    lbItens.ListItems[lbItens.Count - 1].StyleLookup := 'ListBoxItem2Style1';
+  end;
+
+  // Completa as Configurações de Armazenamento
+  edtDiretorio.Text := lRotina.Configuracao.Diretorio;
+  edtSenhaArquivo.Text := lRotina.Configuracao.SenhaDeArquivo;
+  edtServidor.Text := lRotina.Configuracao.Servidor;
+  edtUsuario.Text := lRotina.Configuracao.Usuario;
+  edtSenhaServidor.Text := lRotina.Configuracao.Senha;
+  edtPorta.Text := lRotina.Configuracao.Porta.ToString;
+
+  // Ajusta o ComboBox
+  if lRotina.Configuracao.TipoConfiguracao = FTP then
+    cbModeloArmazenamento.ItemIndex := 1
+  else
+    cbModeloArmazenamento.ItemIndex := 0;
+
+  edtDescricaoRotina.SetFocus;
+end;
+
+procedure TFormMenuPrincipal.HabilitarFoco(Sender: TObject;
+  const aAtivar: Boolean = True);
+var
+  lParentRectangle: TRectangle;
+begin
+  if Sender is TEdit then
+    lParentRectangle := TEdit(Sender).Parent as TRectangle
+  else if Sender is TTimeEdit then
+    lParentRectangle := TTimeEdit(Sender).Parent as TRectangle
+  else if Sender is TComboBox then
+    lParentRectangle := TComboBox(Sender).Parent as TRectangle;
+
+  if Assigned(lParentRectangle) then
+  begin
+    if aAtivar then
+    begin
+      lParentRectangle.Stroke.Color := $FF4F67AA;
+      lParentRectangle.Stroke.Thickness := 2;
+    end
+    else
+    begin
+      lParentRectangle.Stroke.Color := $FFB6B6B6;
+      lParentRectangle.Stroke.Thickness := 1;
+    end;
+  end;
 end;
 
 procedure TFormMenuPrincipal.ListView1Paint(Sender: TObject; Canvas: TCanvas;
@@ -410,16 +556,152 @@ procedure TFormMenuPrincipal.cbModeloArmazenamentoChange(Sender: TObject);
 begin
   case cbModeloArmazenamento.ItemIndex of
     0:
-      FTPSelecionado(False);
+      begin
+        FTPSelecionado(False);
+        Focar(edtSenhaArquivo)
+      end;
     1:
-      FTPSelecionado(True);
+      begin
+        FTPSelecionado(True);
+        Focar(edtDiretorio)
+      end;
   end;
+end;
+
+procedure TFormMenuPrincipal.ValidarNumero(Sender: TObject);
+var
+  newText: string;
+  I: Integer;
+begin
+  if Sender is TEdit then
+  begin
+    newText := '';
+    for I := 1 to Length(TEdit(Sender).Text) do
+    begin
+      if CharInSet(TEdit(Sender).Text[I], ['0' .. '9']) then
+      begin
+        newText := newText + TEdit(Sender).Text[I];
+      end;
+    end;
+    if TEdit(Sender).Text <> newText then
+    begin
+      TEdit(Sender).Text := newText;
+      TEdit(Sender).SelStart := Length(newText);
+    end;
+  end;
+end;
+
+procedure TFormMenuPrincipal.edtDescricaoRotinaEnter(Sender: TObject);
+begin
+  HabilitarFoco(Sender);
+end;
+
+procedure TFormMenuPrincipal.edtDescricaoRotinaExit(Sender: TObject);
+begin
+  HabilitarFoco(Sender, False);
+end;
+
+procedure TFormMenuPrincipal.edtDescricaoRotinaKeyDown(Sender: TObject;
+  var Key: Word; var KeyChar: Char; Shift: TShiftState);
+begin
+  if (Key in [vkReturn, vkTab]) then
+  begin
+    Focar(edtLimiteBackups);
+  end;
+end;
+
+procedure TFormMenuPrincipal.edtDiretorioKeyDown(Sender: TObject; var Key: Word;
+  var KeyChar: Char; Shift: TShiftState);
+begin
+  if (Key in [vkReturn, vkTab]) then
+  begin
+    Focar(edtSenhaArquivo)
+  end;
+end;
+
+procedure TFormMenuPrincipal.edtLimiteBackupsKeyDown(Sender: TObject;
+  var Key: Word; var KeyChar: Char; Shift: TShiftState);
+begin
+  if (Key in [vkReturn, vkTab]) then
+  begin
+    Focar(tedtHorario);
+  end;
+end;
+
+procedure TFormMenuPrincipal.edtLimiteBackupsTyping(Sender: TObject);
+begin
+  ValidarNumero(Sender);
+end;
+
+procedure TFormMenuPrincipal.Focar(aControle: TFMXObject);
+begin
+  if aControle is TEdit then
+  begin
+    TEdit(aControle).SetFocus;
+    TEdit(aControle).SelectAll;
+  end
+  else
+    tcontrol(aControle).SetFocus;
+
 end;
 
 procedure TFormMenuPrincipal.edtPesquisaTyping(Sender: TObject);
 begin
   TimerPesquisa.Enabled := False;
   TimerPesquisa.Enabled := True;
+end;
+
+procedure TFormMenuPrincipal.edtSenhaArquivoKeyDown(Sender: TObject;
+  var Key: Word; var KeyChar: Char; Shift: TShiftState);
+begin
+  if (Key in [vkReturn, vkTab]) then
+  begin
+    if edtServidor.CanFocus then
+      Focar(edtServidor)
+  end;
+end;
+
+procedure TFormMenuPrincipal.edtSenhaServidorKeyDown(Sender: TObject;
+  var Key: Word; var KeyChar: Char; Shift: TShiftState);
+begin
+  if (Key in [vkReturn, vkTab]) then
+  begin
+    Focar(edtPorta);
+  end;
+end;
+
+procedure TFormMenuPrincipal.edtServidorKeyDown(Sender: TObject; var Key: Word;
+  var KeyChar: Char; Shift: TShiftState);
+begin
+  if (Key in [vkReturn, vkTab]) then
+  begin
+    Focar(edtUsuario);
+  end;
+end;
+
+procedure TFormMenuPrincipal.edtUsuarioKeyDown(Sender: TObject; var Key: Word;
+  var KeyChar: Char; Shift: TShiftState);
+begin
+  if (Key in [vkReturn, vkTab]) then
+  begin
+    Focar(edtSenhaServidor);
+  end;
+end;
+
+procedure TFormMenuPrincipal.rectCheckBoxIniciarWindowsClick(Sender: TObject);
+begin
+  if lblIconCheck.Text='' then // Marcado;
+  begin
+    lblIconCheck.Text:= '';
+    lblIconCheck.Font.Family := 'Font Awesome 6 Free';
+    TControllerSettings.New.Item.IniciarComWindows(False).Salvar;
+  end
+  else
+  begin
+    lblIconCheck.Text:='';
+    lblIconCheck.Font.Family:= 'Font Awesome 6 Free Solid';
+    TControllerSettings.New.Item.IniciarComWindows(True).Salvar;
+  end;
 end;
 
 procedure TFormMenuPrincipal.rectTopoMouseDown(Sender: TObject;
@@ -430,11 +712,20 @@ end;
 
 procedure TFormMenuPrincipal.rectTopoResized(Sender: TObject);
 begin
-  // Verifica��o para n�o bugar as bordas arredondas em tela maximizada
+  // Verificação para não bugar as bordas arredondas em tela maximizada
   if Self.WindowState = TWindowState.wsMaximized then
     AplicaBordas(0)
   else
     AplicaBordas(20)
+end;
+
+procedure TFormMenuPrincipal.tedtHorarioKeyDown(Sender: TObject; var Key: Word;
+  var KeyChar: Char; Shift: TShiftState);
+begin
+  if (Key in [vkReturn, vkTab]) then
+  begin
+    Focar(cbModeloArmazenamento);
+  end;
 end;
 
 procedure TFormMenuPrincipal.TimerPesquisaTimer(Sender: TObject);

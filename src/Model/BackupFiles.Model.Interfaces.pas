@@ -44,6 +44,7 @@ type
     function BuscarDados(aCodigo: string): iStorageSettings;
     function Salvar: iStorageSettings;
     function Codigo: string;
+    procedure Deletar;
   end;
 
   iRoutine = interface
@@ -71,6 +72,7 @@ type
     function Codigo: string;
     function IniciarComWindows(Value: Boolean): iSettings; overload;
     function IniciarComWindows: Boolean; overload;
+    function Salvar: iSettings;
   end;
 
 implementation

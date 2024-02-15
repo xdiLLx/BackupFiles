@@ -91,18 +91,27 @@ begin
 
       txt := TListItemText(Objects.FindDrawable('Descricao'));
       txt.Text := aRotina.Descricao;
+      txt.TagString := aRotina.Codigo;
 
       txt := TListItemText(Objects.FindDrawable('Horario'));
       txt.Text := FormatDateTime('hh:mm', aRotina.Horario);
+      txt.TagString := aRotina.Codigo;
 
       txt := TListItemText(Objects.FindDrawable('Limite'));
       txt.Text := aRotina.TotalBackupsSalvos.ToString;
+      txt.TagString := aRotina.Codigo;
 
       txt := TListItemText(Objects.FindDrawable('Icon'));
       txt.Text := '';
+      txt.TagString := aRotina.Codigo;
 
       txt := TListItemText(Objects.FindDrawable('IconExcluir'));
       txt.Text := '';
+      txt.TagString := aRotina.Codigo;
+
+      txt := TListItemText(Objects.FindDrawable('IconPlay'));
+      txt.Text := '';
+      txt.TagString := aRotina.Codigo;
     end;
   except
     raise Exception.Create('Ocorreu um erro ao listar as rotinas');
@@ -112,7 +121,7 @@ end;
 function TControllerRoutine.ListarRotinas: TList<iRoutine>;
 begin
   FListaRotinas := TRoutine.ListarRotinas;
-  Result:= FListaRotinas;
+  Result := FListaRotinas;
 end;
 
 class function TControllerRoutine.New: iControllerRoutine;

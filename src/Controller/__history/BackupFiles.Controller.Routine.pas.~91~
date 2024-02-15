@@ -1,0 +1,123 @@
+﻿unit BackupFiles.Controller.Routine;
+
+interface
+
+uses
+  BackupFiles.Controller.Interfaces,
+  BackupFiles.Model.Interfaces,
+  System.Generics.Collections,
+  System.Classes,
+  FMX.ListView;
+
+type
+  TControllerRoutine = class(TInterfacedObject, iControllerRoutine)
+  private
+    FListaRotinas: TList<iRoutine>;
+    procedure AddRotina(aRotina: iRoutine; aListView: TListView);
+    { Campos privados }
+  public
+    constructor Create;
+    destructor Destroy; override;
+    class function New: iControllerRoutine;
+    function Item: iRoutine;
+    function ListarRotinas: TList<iRoutine>; overload;
+    procedure ListarRotinas(var aListView: TListView; aPagina: integer;
+      aBusca: string; aLimparLista: boolean); overload;
+  end;
+
+implementation
+
+uses
+  BackupFiles.Model.Routine,
+  FMX.ListView.Types,
+  FMX.ListView.Appearances,
+  System.SysUtils;
+
+{ TControllerRoutine }
+
+constructor TControllerRoutine.Create;
+begin
+
+end;
+
+destructor TControllerRoutine.Destroy;
+begin
+  if Assigned(FListaRotinas) then
+    FListaRotinas.Free;
+
+  inherited;
+end;
+
+function TControllerRoutine.Item: iRoutine;
+begin
+  Result := TRoutine.New;
+end;
+
+procedure TControllerRoutine.ListarRotinas(var aListView: TListView;
+  aPagina: integer; aBusca: string; aLimparLista: boolean);
+begin
+  aListView.BeginUpdate;
+
+  // Limpar a lista...
+  if aLimparLista then
+  begin
+    aPagina := 1;
+    aListView.ScrollTo(0);
+    aListView.Items.Clear;
+  end;
+
+  // Salva a pagina atual a ser exibida...
+  aListView.Tag := aPagina;
+
+  FListaRotinas := TRoutine.ListarRotinas(aPagina, aBusca);
+  for var Item in FListaRotinas do
+  begin
+    AddRotina(Item, aListView);
+  end;
+end;
+
+procedure TControllerRoutine.AddRotina(aRotina: iRoutine; aListView: TListView);
+var
+  Item: TListViewItem;
+  txt: TListItemText;
+begin
+  try
+    Item := aListView.Items.Add;
+
+    with Item do
+    begin
+      Height := 44;
+      TagString := aRotina.Codigo;
+
+      txt := TListItemText(Objects.FindDrawable('Descricao'));
+      txt.Text := aRotina.Descricao;
+
+      txt := TListItemText(Objects.FindDrawable('Horario'));
+      txt.Text := FormatDateTime('hh:mm', aRotina.Horario);
+
+      txt := TListItemText(Objects.FindDrawable('Limite'));
+      txt.Text := aRotina.TotalBackupsSalvos.ToString;
+
+      txt := TListItemText(Objects.FindDrawable('Icon'));
+      txt.Text := '';
+
+      txt := TListItemText(Objects.FindDrawable('IconExcluir'));
+      txt.Text := '';
+    end;
+  except
+    raise Exception.Create('Ocorreu um erro ao listar as rotinas');
+  end;
+end;
+
+function TControllerRoutine.ListarRotinas: TList<iRoutine>;
+begin
+  FListaRotinas := TRoutine.ListarRotinas;
+  Result:= FListaRotinas;
+end;
+
+class function TControllerRoutine.New: iControllerRoutine;
+begin
+  Result := Self.Create;
+end;
+
+end.

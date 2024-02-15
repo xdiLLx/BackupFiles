@@ -35,6 +35,9 @@ type
 
 implementation
 
+uses
+  FMX.Dialogs;
+
 { TSettings }
 
 procedure TSettings.RemoverDoInicializar;
@@ -44,11 +47,13 @@ begin
   Registry := TRegistry.Create(KEY_WRITE OR KEY_WOW64_64KEY);
   try
     Registry.RootKey := HKEY_CURRENT_USER;
-    if Registry.OpenKey('\Software\Microsoft\Windows\CurrentVersion\Run', True)
+    if Registry.OpenKey('\Software\Microsoft\Windows\CurrentVersion\Run\', True)
     then
     begin
-      if Registry.ValueExists('BackupFiles') then
-        Registry.DeleteValue('BackupFiles');
+      if Registry.DeleteValue('BackupFiles') then
+      begin
+
+      end;
       Registry.CloseKey;
     end;
   finally

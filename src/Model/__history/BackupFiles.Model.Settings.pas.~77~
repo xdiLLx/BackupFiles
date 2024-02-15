@@ -47,8 +47,7 @@ begin
     if Registry.OpenKey('\Software\Microsoft\Windows\CurrentVersion\Run', True)
     then
     begin
-      if Registry.ValueExists('BackupFiles') then
-        Registry.DeleteValue('BackupFiles');
+      Registry.DeleteValue('BackupFiles');
       Registry.CloseKey;
     end;
   finally
@@ -66,7 +65,7 @@ begin
     if Registry.OpenKey('\Software\Microsoft\Windows\CurrentVersion\Run', True)
     then
     begin
-      Registry.WriteString('GD BackupFiles', ExtractFilePath(ParamStr(0)) +
+      Registry.WriteString('BackupFiles', ExtractFilePath(ParamStr(0)) +
         'BackupFiles.exe');
       Registry.CloseKey;
     end;

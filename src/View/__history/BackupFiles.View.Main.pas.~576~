@@ -11,7 +11,7 @@ uses
   FMX.Layouts, FMX.ListView.Types, FMX.ListView.Appearances,
   FMX.ListView.Adapters.Base, FMX.ListView, BackupFiles.Controller.BackupItem,
   BackupFiles.Controller.StorageSettings, BackupFiles.Model.Interfaces,
-  BackupFiles.Controller.Settings;
+  BackupFiles.Controller.Settings, FMX.uNotificador;
 
 type
   TFormMenuPrincipal = class(TForm)
@@ -133,6 +133,7 @@ type
     lblInfoIniciarComWindows: TLabel;
     lblIconCheck: TLabel;
     Label8: TLabel;
+    TimerRotinas: TTimer;
     procedure rectTopoMouseDown(Sender: TObject; Button: TMouseButton;
       Shift: TShiftState; X, Y: Single);
     procedure rectTopoResized(Sender: TObject);
@@ -184,12 +185,13 @@ type
     procedure FTPSelecionado(aValue: Boolean);
     procedure MudaPagina(var aTabItem: TTabItem);
     procedure LimparCampos;
-    procedure GravarDados;
+    function GravarDados: Boolean;
     procedure Pesquisar;
     procedure AlterarRotina;
     procedure HabilitarFoco(Sender: TObject; const aAtivar: Boolean = True);
     procedure Focar(aControle: TFMXObject);
     procedure ValidarNumero(Sender: TObject);
+    procedure CarregaConfiguracao;
     { Private declarations }
   public
     { Public declarations }
@@ -238,6 +240,10 @@ begin
   MudaPagina(tabListaRotinas);
   FCriando := False;
   LimparCampos;
+  TNotificador.New.Titulo('Alterações Canceladas com Sucesso')
+    .Mensagem(
+    'Cancelamento efetuado com sucesso, os dados não foram modificados')
+    .ModeloMensagem(msgErro).ExibirNotificacao;
 end;
 
 procedure TFormMenuPrincipal.btnConfigClick(Sender: TObject);
@@ -296,7 +302,7 @@ begin
   Limpar(rectBaseItens);
   FCodigoRotina := '';
   lbItens.Clear;
-  lblNomeProjeto.Text:= 'Nova Rotina'
+  lblNomeProjeto.Text := 'Nova Rotina'
 end;
 
 procedure TFormMenuPrincipal.btnExcluirRotinaClick(Sender: TObject);
@@ -306,12 +312,12 @@ end;
 
 procedure TFormMenuPrincipal.btnGravarClick(Sender: TObject);
 begin
-  MudaPagina(tabListaRotinas);
   GravarDados;
+  MudaPagina(tabListaRotinas);
   LimparCampos;
 end;
 
-procedure TFormMenuPrincipal.GravarDados;
+function TFormMenuPrincipal.GravarDados: Boolean;
 var
   lRotina: iRoutine;
   lConfig: iStorageSettings;
@@ -361,10 +367,25 @@ begin
 
     lConfig.Salvar;
     lRotina.Salvar;
-  finally
+
+    Result := True;
     TControllerRoutine.New.ListarRotinas(ListView1, ListView1.Tag,
       edtPesquisa.Text, True);
-  end;
+    if FCriando then
+    begin
+      TNotificador.New.Titulo('Rotina criada com sucesso')
+        .Mensagem('A rotina foi cadastrada e adicionada ao banco de dados')
+        .ModeloMensagem(msgSucesso).ExibirNotificacao;
+    end
+    else
+      TNotificador.New.Titulo('Rotina Alterada com Sucesso')
+        .Mensagem(
+        'Os dados e alterações da sua rotina foram alterados com sucesso no banco de dados')
+        .ModeloMensagem(msgSucesso).ExibirNotificacao;
+  finally
+
+  end
+
 end;
 
 procedure TFormMenuPrincipal.btnListaDeArquivosClick(Sender: TObject);
@@ -391,6 +412,17 @@ begin
   MudaPagina(tabListaRotinas);
   TControllerRoutine.New.ListarRotinas(ListView1, ListView1.Tag,
     edtPesquisa.Text, True);
+  CarregaConfiguracao;
+end;
+
+procedure TFormMenuPrincipal.CarregaConfiguracao;
+begin
+  if TControllerSettings.New.Item.IniciarComWindows then
+  begin
+    lblIconCheck.Text := '';
+    lblIconCheck.Font.Family := 'Font Awesome 6 Free Solid';
+    // TControllerSettings.New.Item.IniciarComWindows(True).Salvar;
+  end;
 end;
 
 procedure TFormMenuPrincipal.FTPSelecionado(aValue: Boolean);
@@ -431,6 +463,10 @@ begin
   begin
     TControllerRoutine.New.Item.BuscarDados(ItemObject.TagString).Deletar;
     ListView1.Items.Delete(ItemIndex);
+    TNotificador.New.Titulo('Rotina excluida com sucesso')
+      .Mensagem('A rotina foi excluida ao banco de dados')
+      .ModeloMensagem(msgNormal).ExibirNotificacao;
+
   end
   else if ItemObject.Name = 'IconPlay' then
   begin
@@ -677,14 +713,16 @@ end;
 
 procedure TFormMenuPrincipal.rectCheckBoxIniciarWindowsClick(Sender: TObject);
 begin
-  if lblIconCheck.Text='' then // Marcado;
+  if lblIconCheck.Text = '' then // Marcado;
   begin
-    lblIconCheck.Text:= '';
+    lblIconCheck.Text := '';
+    lblIconCheck.Font.Family := 'Font Awesome 6 Free';
     TControllerSettings.New.Item.IniciarComWindows(False).Salvar;
   end
   else
   begin
-    lblIconCheck.Text:='';
+    lblIconCheck.Text := '';
+    lblIconCheck.Font.Family := 'Font Awesome 6 Free Solid';
     TControllerSettings.New.Item.IniciarComWindows(True).Salvar;
   end;
 end;
